@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: api-gateway
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  datasource:
+    url: jdbc:mysql://localhost:3306/api-gateway?createDatabaseIfNotExist=true
+    username: gateway
+    password: gateway
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+app:
+  jwt:
+    access-minutes: 180
+    secret: henifdcbogloejkoiurkfvscfkbpimjgntytjtvkotgfkjerdtfvuyhjioklmjnbhhfcdrtyuhjikfdy
