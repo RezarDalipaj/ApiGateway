@@ -18,4 +18,6 @@ public interface IRateLimitService {
 
     @Transactional
     void delete(Long id);
+
+    RateLimitDto getFromInMemory(String rawApiKey);
 }

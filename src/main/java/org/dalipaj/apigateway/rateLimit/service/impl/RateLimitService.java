@@ -43,15 +43,16 @@ public class RateLimitService implements IRateLimitService {
 
     @Override
     public RateLimitDto save(RateLimitDto rateLimitDto) {
-        var hashedApiKey = hashService.encode(rateLimitDto.getApiKey());
-        RateLimitEntity entity = rateLimitRepository.findByApiKey(hashedApiKey)
-                .orElse(null);
+        String hashedApiKey;
+        RateLimitEntity entity;
 
-        if (entity == null) {
+        if (rateLimitDto.getId() == null) {
             entity = rateLimitMapper.toEntity(rateLimitDto);
+            hashedApiKey = hashService.encode(entity.getApiKey());
             entity.setApiKey(hashedApiKey);
         } else {
-            updateDb(entity, rateLimitDto);
+            entity = updateDb(rateLimitDto);
+            hashedApiKey = entity.getApiKey();
         }
 
         entity = rateLimitRepository.save(entity);
@@ -61,19 +62,29 @@ public class RateLimitService implements IRateLimitService {
         return rateLimitDto;
     }
     
-    private void updateDb(RateLimitEntity entity, RateLimitDto rateLimitDto) {
+    private RateLimitEntity updateDb(RateLimitDto rateLimitDto) {
+        var entity = findById(rateLimitDto.getId());
+
         if (rateLimitDto.getPerMinute() != null)
             entity.setPerMinute(rateLimitDto.getPerMinute());
 
         if (rateLimitDto.getPerHour() != null)
             entity.setPerHour(rateLimitDto.getPerHour());
+
+        if (rateLimitDto.getApiKey() != null)
+            entity.setApiKey(hashService.encode(rateLimitDto.getApiKey()));
+
+        return entity;
+    }
+
+    private RateLimitEntity findById(Long id) {
+        return rateLimitRepository.findById(id)
+                .orElseThrow(() -> new NullPointerException("Rate limit with id: " + id + " not found"));
     }
     
     @Override
     public RateLimitDto getById(Long id) {
-        return rateLimitMapper.toDto(
-                rateLimitRepository.findById(id)
-                        .orElseThrow(() -> new NullPointerException("Rate limit with id: " + id + " not found")));
+        return rateLimitMapper.toDto(findById(id));
     }
 
     @Override
@@ -90,15 +101,15 @@ public class RateLimitService implements IRateLimitService {
 
     @Override
     public void delete(Long id) {
-        var rateLimitEntity = rateLimitRepository.findById(id)
-                .orElse(null);
-
-        if (rateLimitEntity == null) {
-            log.info("Rate limit with id {} not found", id);
-            return;
-        }
+        var rateLimitEntity = findById(id);
 
         rateLimitRepository.delete(rateLimitEntity);
         gatewayCache.getRateLimits().remove(rateLimitEntity.getApiKey());
+    }
+
+    @Override
+    public RateLimitDto getFromInMemory(String rawApiKey) {
+        var hashedApiKey = hashService.encode(rawApiKey);
+        return gatewayCache.getRateLimits().get(hashedApiKey);
     }
 }
