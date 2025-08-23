@@ -1,9 +1,8 @@
 package org.dalipaj.apigateway.exception.handler;
 
+import org.dalipaj.apigateway.exception.ErrorDto;
 import org.dalipaj.apigateway.exception.custom.BadRequestException;
 import org.dalipaj.apigateway.exception.custom.UnAuthorizedException;
-import org.dalipaj.apigateway.model.dto.response.ErrorDto;
-import org.dalipaj.apigateway.util.constants.Constants;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +19,11 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    public static final String NOT_FOUND_MESSAGE = "Not found";
+
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ErrorDto> handleNullPointerException(NullPointerException nullException) {
-        return buildError(nullException.getMessage() == null ? Constants.NOT_FOUND_MESSAGE
+        return buildError(nullException.getMessage() == null ? NOT_FOUND_MESSAGE
                 : nullException.getMessage(), HttpStatus.NOT_FOUND);
     }
 

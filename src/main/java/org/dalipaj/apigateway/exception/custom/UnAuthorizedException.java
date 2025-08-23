@@ -1,12 +1,12 @@
 package org.dalipaj.apigateway.exception.custom;
 
-import org.dalipaj.apigateway.util.constants.Constants;
-
 public class UnAuthorizedException extends Exception {
+    public static final String UNAUTHORIZED_MESSAGE = "Unauthorized!";
+
     public UnAuthorizedException(String message) {
         super(message);
     }
     public UnAuthorizedException() {
-        super(Constants.UNAUTHORIZED_MESSAGE);
+        super(UNAUTHORIZED_MESSAGE);
     }
 }

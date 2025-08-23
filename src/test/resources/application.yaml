@@ -8,3 +8,13 @@ spring:
   datasource:
     url: jdbc:h2:mem:api-gateway;
     driverClassName: org.h2.Driver
+
+app:
+  salt: testTest
+  jwt:
+    access-minutes: 180
+    secret: testTesttestTesttestTesttestTesttestTesttestTesttestTesttestTesttestTesttestTesttestTest
+  response-ttl-minutes: 5
+  rate-limit:
+    perMinute: 100
+    perHour: 1000

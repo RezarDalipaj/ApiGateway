@@ -12,6 +12,11 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 app:
+  salt: ygvbimuhergt
   jwt:
     access-minutes: 180
     secret: henifdcbogloejkoiurkfvscfkbpimjgntytjtvkotgfkjerdtfvuyhjioklmjnbhhfcdrtyuhjikfdy
+  response-ttl-minutes: 5
+  rate-limit:
+    perMinute: 100
+    perHour: 1000
