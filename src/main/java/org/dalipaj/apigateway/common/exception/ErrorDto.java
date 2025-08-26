@@ -1,4 +1,4 @@
-package org.dalipaj.apigateway.exception;
+package org.dalipaj.apigateway.common.exception;
 
 import lombok.Builder;
 import lombok.Getter;

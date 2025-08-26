@@ -22,16 +22,14 @@ public class FilterUtil<T> {
     }
 
     private <Y> Path<Y> getEntityField(Root<T> root, String fullKey) {
-        if (!fullKey.contains(".")) {
+        if (!fullKey.contains("."))
             return root.get(fullKey);
-        }
 
         var keys = fullKey.split("\\.");
         Path<Y> field = root.get(keys[0]);
 
-        for (int i = 1; i < keys.length; i++) {
+        for (int i = 1; i < keys.length; i++)
             field = field.get(keys[i]);
-        }
 
         return field;
     }

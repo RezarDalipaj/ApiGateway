@@ -1,4 +1,4 @@
-package org.dalipaj.apigateway.exception;
+package org.dalipaj.apigateway.common.exception;
 
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.error.ErrorAttributeOptions.Include;

@@ -1,14 +1,18 @@
 package org.dalipaj.apigateway.user.service.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
-import org.dalipaj.apigateway.exception.custom.BadRequestException;
+import org.dalipaj.apigateway.auth.UnAuthorizedException;
+import org.dalipaj.apigateway.auth.service.impl.TokenProvider;
+import org.dalipaj.apigateway.common.exception.BadRequestException;
 import org.dalipaj.apigateway.auth.service.IHashService;
 import org.dalipaj.apigateway.user.UserEntity;
 import org.dalipaj.apigateway.user.UserDto;
 import org.dalipaj.apigateway.user.UserRepository;
 import org.dalipaj.apigateway.user.mapper.UserMapper;
 import org.dalipaj.apigateway.user.service.IUserService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +23,11 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final IHashService hashService;
     private final UserMapper userMapper;
+    private final TokenProvider tokenProvider;
 
 
-    private UserEntity findUserByUsername(String username) {
+    @Override
+    public UserEntity findUserByUsername(String username) {
         var entity = userRepository.findByUsername(username);
         if (entity == null)
             throw new NullPointerException("User with username " + username + " does not exist");
@@ -83,7 +89,7 @@ public class UserService implements IUserService {
     }
 
     private void setPassword(UserEntity user, String rawPassword) {
-        user.setPassword(hashService.encode(rawPassword));
+        user.setPassword(encode(rawPassword));
     }
 
     public void validateUsername(String username) throws BadRequestException {
@@ -100,6 +106,27 @@ public class UserService implements IUserService {
     public UserDto getUserByUsername(String username) {
         var user = findUserByUsername(username);
         return userMapper.userToUserDto(user);
+    }
+
+    @Override
+    public String getUsernameFromRequest(HttpServletRequest request) throws UnAuthorizedException {
+        return tokenProvider.getUsernameFromRequest(request);
+    }
+
+    @Override
+    public void validateUsername(String usernameFromRequest, String actualUsername) {
+        if (!usernameFromRequest.equals(actualUsername))
+            throw new AccessDeniedException("Access denied: Cannot access this resource");
+    }
+
+    @Override
+    public String salt(String raw) {
+        return hashService.salt(raw);
+    }
+
+    @Override
+    public String encode(String raw) {
+        return hashService.encode(raw);
     }
 
 }

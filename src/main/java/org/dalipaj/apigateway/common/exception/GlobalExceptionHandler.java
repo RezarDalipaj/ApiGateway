@@ -1,8 +1,11 @@
-package org.dalipaj.apigateway.exception.handler;
+package org.dalipaj.apigateway.common.exception;
 
-import org.dalipaj.apigateway.exception.ErrorDto;
-import org.dalipaj.apigateway.exception.custom.BadRequestException;
-import org.dalipaj.apigateway.exception.custom.UnAuthorizedException;
+import lombok.RequiredArgsConstructor;
+import org.dalipaj.apigateway.auth.UnAuthorizedException;
+import org.dalipaj.apigateway.gateway.ApiCallException;
+import org.dalipaj.apigateway.rateLimit.RateLimitException;
+import org.dalipaj.apigateway.route.response.RouteResponseDto;
+import org.dalipaj.apigateway.route.service.IRouteService;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +20,10 @@ import java.util.Map;
 
 
 @ControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
+    private final IRouteService routeService;
     public static final String NOT_FOUND_MESSAGE = "Not found";
 
     @ExceptionHandler(NullPointerException.class)
@@ -45,6 +50,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorDto> handleBadCredentialsException(BadCredentialsException badCredentialsException) {
         return getError(badCredentialsException, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<ErrorDto> handleRateLimitException(RateLimitException rateLimitException) {
+        return getError(rateLimitException, HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    @ExceptionHandler(ApiCallException.class)
+    public ResponseEntity<RouteResponseDto> handleApiCallException(ApiCallException apiCallException) {
+        var responseWithMetadata = apiCallException.getResponseWithMetadata();
+        routeService.saveRouteResponseInCache(responseWithMetadata);
+
+        return ResponseEntity.status(apiCallException.getStatus())
+                .body(responseWithMetadata.getResponse());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -1,7 +1,7 @@
 package org.dalipaj.apigateway.auth.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dalipaj.apigateway.exception.custom.BadRequestException;
+import org.dalipaj.apigateway.common.exception.BadRequestException;
 import org.dalipaj.apigateway.user.UserDto;
 import org.dalipaj.apigateway.auth.LoginDto;
 import org.dalipaj.apigateway.auth.TokenDto;

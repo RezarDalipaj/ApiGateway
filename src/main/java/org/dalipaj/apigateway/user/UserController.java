@@ -1,7 +1,7 @@
 package org.dalipaj.apigateway.user;
 
 import lombok.RequiredArgsConstructor;
-import org.dalipaj.apigateway.exception.custom.BadRequestException;
+import org.dalipaj.apigateway.common.exception.BadRequestException;
 import org.dalipaj.apigateway.user.service.IUserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

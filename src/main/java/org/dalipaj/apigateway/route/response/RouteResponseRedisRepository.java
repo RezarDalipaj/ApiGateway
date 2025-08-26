@@ -11,11 +11,11 @@ public class RouteResponseRedisRepository {
     private final RedisTemplate<String, RouteRedisResponseWithMetadata> responseRedisTemplate;
     public static final String ROUTE_KEY_PREFIX = "route:";
 
-    public void saveResponse(RouteRedisResponseWithMetadata routeRedisResponseWithMetadata) {
+    public void save(RouteRedisResponseWithMetadata routeRedisResponseWithMetadata) {
         responseRedisTemplate.opsForValue().set(ROUTE_KEY_PREFIX + routeRedisResponseWithMetadata.getExactPath(), routeRedisResponseWithMetadata);
     }
 
-    public RouteRedisResponseWithMetadata getResponse(String path) {
+    public RouteRedisResponseWithMetadata get(String path) {
         return responseRedisTemplate.opsForValue().get(ROUTE_KEY_PREFIX + path);
     }
 

@@ -1,7 +1,9 @@
 package org.dalipaj.apigateway.rateLimit;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.dalipaj.apigateway.auth.UnAuthorizedException;
 import org.dalipaj.apigateway.common.FilterDto;
 import org.dalipaj.apigateway.rateLimit.service.IRateLimitService;
 import org.springframework.data.domain.Page;
@@ -28,41 +30,42 @@ public class RateLimitController {
     private final IRateLimitService rateLimitService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RateLimitDto> create(@Valid @RequestBody RateLimitDto rateLimitDto) {
-        var createdRateLimit = rateLimitService.save(rateLimitDto);
+    public ResponseEntity<RateLimitDto> create(@Valid @RequestBody RateLimitDto rateLimitDto,
+                                               HttpServletRequest request) throws UnAuthorizedException {
+        var createdRateLimit = rateLimitService.save(rateLimitDto, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRateLimit);
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Page<RateLimitDto>> getAll(@RequestBody List<FilterDto> filters,
-                                                 @RequestParam(defaultValue = "0") int page,
-                                                 @RequestParam(defaultValue = "10") int size) {
-        var filteredRoutes = rateLimitService.getAll(page, size, filters);
-        return ResponseEntity.ok(filteredRoutes);
+                                                     @RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "10") int size) {
+        var filteredRateLimits = rateLimitService.getAll(page, size, filters);
+        return ResponseEntity.ok(filteredRateLimits);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RateLimitDto> update(@RequestBody RateLimitDto rateLimitDto, @PathVariable Long id) {
+    public ResponseEntity<RateLimitDto> update(@RequestBody RateLimitDto rateLimitDto,
+                                               @PathVariable Long id,
+                                               HttpServletRequest request) throws UnAuthorizedException {
         rateLimitDto.setId(id);
-        RateLimitDto updatedRoute = rateLimitService.save(rateLimitDto);
-        return ResponseEntity.ok(updatedRoute);
+        RateLimitDto updatedRateLimit = rateLimitService.save(rateLimitDto, request);
+        return ResponseEntity.ok(updatedRateLimit);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RateLimitDto> delete(@PathVariable Long id) {
-        rateLimitService.delete(id);
+    public ResponseEntity<RateLimitDto> delete(@PathVariable Long id,
+                                               HttpServletRequest request) throws UnAuthorizedException {
+        rateLimitService.delete(id, request);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RateLimitDto> get(@PathVariable Long id) {
-        var route = rateLimitService.getById(id);
-        return ResponseEntity.ok(route);
+    public ResponseEntity<RateLimitDto> get(@PathVariable Long id,
+                                            HttpServletRequest request) throws UnAuthorizedException {
+        var rateLimit = rateLimitService.getById(id, request);
+        return ResponseEntity.ok(rateLimit);
     }
 }
 

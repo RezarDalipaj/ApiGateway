@@ -1,7 +1,9 @@
 package org.dalipaj.apigateway.route;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.dalipaj.apigateway.auth.UnAuthorizedException;
 import org.dalipaj.apigateway.route.dto.RouteDto;
 import org.dalipaj.apigateway.common.FilterDto;
 import org.dalipaj.apigateway.route.service.IRouteService;
@@ -29,9 +31,9 @@ public class RouteController {
     private final IRouteService routeService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RouteDto> create(@Valid @RequestBody RouteDto routeDto) {
-        RouteDto createdRoute = routeService.save(routeDto);
+    public ResponseEntity<RouteDto> create(@Valid @RequestBody RouteDto routeDto,
+                                               HttpServletRequest request) throws UnAuthorizedException {
+        var createdRoute = routeService.save(routeDto, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRoute);
     }
 
@@ -45,24 +47,25 @@ public class RouteController {
     }
 
     @PutMapping("/{path}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RouteDto> update(@RequestBody RouteDto routeDto, @PathVariable String path) {
+    public ResponseEntity<RouteDto> update(@RequestBody RouteDto routeDto,
+                                           @PathVariable String path,
+                                           HttpServletRequest request) throws UnAuthorizedException {
         routeDto.setPath(path);
-        RouteDto updatedRoute = routeService.save(routeDto);
+        RouteDto updatedRoute = routeService.save(routeDto, request);
         return ResponseEntity.ok(updatedRoute);
     }
 
     @DeleteMapping("/{path}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RouteDto> delete(@PathVariable String path) {
-        routeService.delete(path);
+    public ResponseEntity<RouteDto> delete(@PathVariable String path,
+                                           HttpServletRequest request) throws UnAuthorizedException {
+        routeService.delete(path, request);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{path}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RouteDto> get(@PathVariable String path) {
-        var route = routeService.getByPath(path);
+    public ResponseEntity<RouteDto> get(@PathVariable String path,
+                                        HttpServletRequest request) throws UnAuthorizedException {
+        var route = routeService.getByPath(path, request);
         return ResponseEntity.ok(route);
     }
 }

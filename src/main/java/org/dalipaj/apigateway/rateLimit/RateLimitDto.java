@@ -1,6 +1,7 @@
 package org.dalipaj.apigateway.rateLimit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -25,4 +26,7 @@ public class RateLimitDto {
     @NotEmpty
     @Size(min = 6, max = 100)
     private String apiKey;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String username;
 }

@@ -2,7 +2,7 @@ package org.dalipaj.apigateway.auth;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.dalipaj.apigateway.exception.custom.BadRequestException;
+import org.dalipaj.apigateway.common.exception.BadRequestException;
 import org.dalipaj.apigateway.user.UserDto;
 import org.dalipaj.apigateway.auth.service.IAuthService;
 import org.springframework.http.ResponseEntity;

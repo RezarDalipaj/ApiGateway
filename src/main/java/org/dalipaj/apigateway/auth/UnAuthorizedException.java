@@ -1,4 +1,4 @@
-package org.dalipaj.apigateway.exception.custom;
+package org.dalipaj.apigateway.auth;
 
 public class UnAuthorizedException extends Exception {
     public static final String UNAUTHORIZED_MESSAGE = "Unauthorized!";

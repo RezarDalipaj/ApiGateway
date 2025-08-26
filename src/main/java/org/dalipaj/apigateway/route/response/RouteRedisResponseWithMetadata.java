@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 public class RouteRedisResponseWithMetadata {
 
-    private RouteRedisResponseDto response;
+    private RouteResponseDto response;
     private LocalDateTime lastCached;
     private String exactPath;
 }

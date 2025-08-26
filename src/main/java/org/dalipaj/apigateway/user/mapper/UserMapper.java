@@ -15,9 +15,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 public interface UserMapper {
 
     @Mapping(source = "authorities", target = "role")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "email", ignore = true)
     UserDto userDetailsToUserDto(UserDetails userDetails);
+
 
     UserDto userToUserDto(UserEntity user);
 
+    @Mapping(target = "rateLimits", ignore = true)
+    @Mapping(target = "routes", ignore = true)
     UserEntity userDtoToEntity(UserDto userDto);
 }

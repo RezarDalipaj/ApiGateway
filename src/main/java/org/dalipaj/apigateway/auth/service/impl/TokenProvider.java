@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dalipaj.apigateway.auth.TokenUtil;
 import org.dalipaj.apigateway.auth.config.JwtProperties;
-import org.dalipaj.apigateway.exception.custom.UnAuthorizedException;
+import org.dalipaj.apigateway.auth.UnAuthorizedException;
 import org.dalipaj.apigateway.user.UserDto;
 import org.dalipaj.apigateway.user.mapper.UserMapper;
 import org.springframework.security.core.Authentication;
@@ -105,11 +105,6 @@ public class TokenProvider {
     public String getUsernameFromAccessToken(String token) throws UnAuthorizedException {
         var claims = getClaimsFromAccessToken(token);
         return claims.getBody().getSubject();
-    }
-
-    public Date getExpirationDateFromToken(String token) throws UnAuthorizedException {
-        var claims = getClaimsFromAccessToken(token);
-        return claims.getBody().getExpiration();
     }
 
     public String getRoleFromToken(String token) throws UnAuthorizedException {
