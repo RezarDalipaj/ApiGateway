@@ -92,11 +92,6 @@ public class TokenProvider {
         return claims.orElseThrow(UnAuthorizedException::new);
     }
 
-    public  <T> T getClaimFromAccessToken(String token, String claimType, Class<T> claimClass) throws UnAuthorizedException {
-        var claims = getClaimsFromAccessToken(token);
-        return claims.getBody().get(claimType, claimClass);
-    }
-
     public String getUsernameFromRequest(HttpServletRequest request) throws UnAuthorizedException {
         var token = TokenUtil.getTokenFromRequest(request);
         return getUsernameFromAccessToken(token);
@@ -105,10 +100,6 @@ public class TokenProvider {
     public String getUsernameFromAccessToken(String token) throws UnAuthorizedException {
         var claims = getClaimsFromAccessToken(token);
         return claims.getBody().getSubject();
-    }
-
-    public String getRoleFromToken(String token) throws UnAuthorizedException {
-        return getClaimFromAccessToken(token, "role", String.class);
     }
 }
 

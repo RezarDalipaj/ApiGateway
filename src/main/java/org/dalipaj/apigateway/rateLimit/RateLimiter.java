@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class RateLimiter {
+    
     private final ConcurrentHashMap<String, Counter> counters = new ConcurrentHashMap<>();
 
     public void allowRequest(String key, long limitPerMinute, long limitPerHour) throws RateLimitException {

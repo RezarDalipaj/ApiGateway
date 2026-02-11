@@ -11,11 +11,10 @@ import org.dalipaj.apigateway.gateway.GatewayCache;
 import org.dalipaj.apigateway.route.RouteEntity;
 import org.dalipaj.apigateway.route.RouteMapper;
 import org.dalipaj.apigateway.route.RouteRepository;
-import org.dalipaj.apigateway.route.RouteUtil;
 import org.dalipaj.apigateway.route.backend.BackendEntity;
 import org.dalipaj.apigateway.route.backend.BackendRepository;
 import org.dalipaj.apigateway.route.dto.RouteDto;
-import org.dalipaj.apigateway.route.dto.RouteTree;
+import org.dalipaj.apigateway.route.dto.RouteTrie;
 import org.dalipaj.apigateway.route.oauth.OAuthEntity;
 import org.dalipaj.apigateway.route.oauth.OAuthRepository;
 import org.dalipaj.apigateway.route.response.RouteRedisResponseWithMetadata;
@@ -27,7 +26,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -47,17 +45,12 @@ public class RouteService implements IRouteService {
 
     @PostConstruct
     void initInMemoryRoutes() {
-        gatewayCache.setRouteTrees(new HashMap<>());
+        gatewayCache.setRouteTrie(new RouteTrie());
         var allRoutes = routeRepository.findAll();
 
         for (RouteEntity route : allRoutes) {
             var routeDto = routeMapper.toDto(route);
-
-            var mainPath = RouteUtil.getMainPath(routeDto.getPath());
-            RouteTree routeTree = new RouteTree();
-            routeTree.save(routeDto);
-
-            gatewayCache.getRouteTrees().put(mainPath, routeTree);
+            gatewayCache.getRouteTrie().insert(routeDto);
         }
     }
 
@@ -75,16 +68,7 @@ public class RouteService implements IRouteService {
         entity = routeRepository.save(entity);
         routeDto = routeMapper.toDto(entity);
 
-        var mainPath = RouteUtil.getMainPath(entity.getPath());
-        var routeTree = gatewayCache.getRouteTrees().get(mainPath);
-
-        if (routeTree == null) {
-            routeTree = new RouteTree();
-            routeTree.save(routeDto);
-            gatewayCache.getRouteTrees().put(mainPath, routeTree);
-        } else {
-            routeTree.save(routeDto);
-        }
+        gatewayCache.getRouteTrie().insert(routeDto);
 
         return routeDto;
     }
@@ -145,12 +129,8 @@ public class RouteService implements IRouteService {
 
     @Override
     public RouteDto getRouteForRequest(String path) {
-        var mainPath = RouteUtil.getMainPath(path);
-        var routeTree = gatewayCache.getRouteTrees().get(mainPath);
-        if (routeTree == null)
-            throw new NullPointerException("Main route: " + mainPath + " not found");
-
-        return routeTree.find(path);
+        return gatewayCache.getRouteTrie().match(path)
+                .orElseThrow(() -> new NullPointerException("Route with path: " + path + " not found"));
     }
 
     @Override
@@ -173,11 +153,8 @@ public class RouteService implements IRouteService {
         var entity = validateUsernameAndGetEntity(path, request);
         routeRepository.delete(entity);
 
-        var routeTree = gatewayCache.getRouteTree(path);
-        if (routeTree != null) {
-            var deleted = routeTree.delete(path);
-            log.info("Route {} was {} deleted from in memory", path, deleted ? "" : "not");
-        }
+        var deleted = gatewayCache.getRouteTrie().delete(path);
+        log.info("Route {} was {} deleted from in memory", path, deleted ? "" : "not");
     }
 
     @Override

@@ -28,7 +28,8 @@ public class GatewayService implements IGatewayService {
     private final IProxyService proxyService;
 
     @Override
-    public RouteResponseDto routeAndPrepareResponse(HttpServletRequest req, Object requestBody) throws RateLimitException {
+    public RouteResponseDto routeAndPrepareResponse(HttpServletRequest req,
+                                                    Object requestBody) throws RateLimitException {
         rateLimitService.allowRequest(req);
 
         var pathWithQueryParams = RouteUtil.getPathWithQueryParams(req);

@@ -19,7 +19,7 @@ public class LoadBalancerStrategyFactory {
 
     public LoadBalancerStrategy getStrategy(LoadBalancerType type) {
         if (type == null)
-            return roundRobinStrategy;
+            return latencyStrategy;
 
         return switch (type) {
             case LATENCY -> latencyStrategy;
