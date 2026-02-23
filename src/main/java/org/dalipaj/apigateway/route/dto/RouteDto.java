@@ -1,15 +1,18 @@
 package org.dalipaj.apigateway.route.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.dalipaj.apigateway.common.validation.OnCreateGroup;
+import org.dalipaj.apigateway.common.validation.OnUpdateGroup;
 import org.dalipaj.apigateway.loadBalancer.LoadBalancerType;
-import org.dalipaj.apigateway.route.backend.BackendDto;
-import org.dalipaj.apigateway.route.oauth.OAuthDto;
 import org.dalipaj.apigateway.route.RouteAuthType;
+import org.dalipaj.apigateway.route.oauth.OAuthDto;
+import org.dalipaj.apigateway.upstream.backend.BackendDto;
 
 import java.util.List;
 
@@ -18,20 +21,18 @@ import java.util.List;
 @Setter
 public class RouteDto {
 
-    @NotBlank
+    @NotBlank(groups = OnCreateGroup.class)
+    @Pattern(regexp = "^/.*", message = "Route path must start with '/'",
+            groups = {OnCreateGroup.class, OnUpdateGroup.class})
     private String path;
-
-    private Boolean stripPrefix;
 
     private RouteAuthType authType;
 
     private LoadBalancerType loadBalancerType;
 
-    @NotEmpty
+    @NotEmpty(groups = OnCreateGroup.class)
+    @Valid
     private List<BackendDto> backends;
 
     private OAuthDto oauth;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private String username;
 }

@@ -10,9 +10,11 @@ import org.mapstruct.NullValueMappingStrategy;
         nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface RateLimitMapper {
 
-    @Mapping(source = "user.username", target = "username")
+    @Mapping(source = "application.name", target = "applicationName")
+    @Mapping(source = "apiKey.lookupKey", target = "apiKey")
     RateLimitDto toDto(RateLimitEntity rateLimit);
 
-    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "application", ignore = true)
+    @Mapping(target = "apiKey", ignore = true)
     RateLimitEntity toEntity(RateLimitDto rateLimitDto);
 }

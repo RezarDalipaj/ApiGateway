@@ -6,10 +6,13 @@ import lombok.Data;
 
 @Data
 public class FilterDto {
+
     @NotBlank
     private String key;
+
     @NotNull
     private Object value;
-    @NotBlank
+
+    @NotNull
     private FilterOperator operator;
 }

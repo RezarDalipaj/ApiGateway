@@ -2,9 +2,10 @@ package org.dalipaj.apigateway.loadBalancer.strategy.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dalipaj.apigateway.loadBalancer.strategy.LoadBalancerStrategy;
-import org.dalipaj.apigateway.route.backend.BackendDto;
+import org.dalipaj.apigateway.upstream.backend.BackendDto;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -12,7 +13,10 @@ import java.util.List;
 public class LeastConnectionsStrategy implements LoadBalancerStrategy {
 
     @Override
-    public BackendDto chooseBackend(List<BackendDto> backends) {
-        return null;
+    public BackendDto chooseBackend(List<BackendDto> backends, String clientIp) {
+        return backends.stream()
+                .filter(BackendDto::isHealthy)
+                .min(Comparator.comparingInt(h -> h.getActiveConnections().get()))
+                .orElseThrow(() -> new NullPointerException("No healthy hosts"));
     }
 }

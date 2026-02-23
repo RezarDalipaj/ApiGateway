@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.dalipaj.apigateway.common.validation.OnCreateGroup;
+import org.dalipaj.apigateway.common.validation.OnUpdateGroup;
 
 import java.io.Serializable;
 
@@ -13,9 +15,10 @@ import java.io.Serializable;
 public class LoginDto implements Serializable {
 
     @NotBlank
-    private String username;
+    private String name;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @NotBlank
-    @Size(min = 6, max = 30)
+    @NotBlank(groups = OnCreateGroup.class)
+    @Size(min = 6, max = 30, groups = {OnCreateGroup.class, OnUpdateGroup.class})
     private String password;
 }

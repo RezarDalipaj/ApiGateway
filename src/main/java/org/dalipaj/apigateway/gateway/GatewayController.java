@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.NoSuchAlgorithmException;
+
 @RestController
 @RequiredArgsConstructor
 public class GatewayController {
@@ -17,7 +19,9 @@ public class GatewayController {
 
     @RequestMapping("/**")
     public ResponseEntity<Object> handle(HttpServletRequest req,
-                                         @RequestBody Object requestBody) throws RateLimitException {
+                                         @RequestBody(required = false) Object requestBody)
+            throws RateLimitException, NoSuchAlgorithmException {
+
         var response = gatewayService.routeAndPrepareResponse(req, requestBody);
 
         return ResponseEntity.status(response.getStatus())

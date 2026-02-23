@@ -3,6 +3,7 @@ package org.dalipaj.apigateway.gateway;
 import lombok.Getter;
 import lombok.Setter;
 import org.dalipaj.apigateway.route.response.RouteRedisResponseWithMetadata;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -11,12 +12,16 @@ public class ApiCallException extends RuntimeException {
 
     private HttpStatus status;
 
+    private HttpMethod httpMethod;
+
     private RouteRedisResponseWithMetadata responseWithMetadata;
 
     public ApiCallException(String message, HttpStatus statusCode,
+                            HttpMethod httpMethod,
                             RouteRedisResponseWithMetadata responseWithMetadata) {
         super(message);
         setStatus(statusCode);
+        setHttpMethod(httpMethod);
         setResponseWithMetadata(responseWithMetadata);
     }
 }

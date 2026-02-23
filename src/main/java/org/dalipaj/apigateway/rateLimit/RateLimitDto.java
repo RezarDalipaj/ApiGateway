@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.dalipaj.apigateway.common.validation.OnCreateGroup;
+import org.dalipaj.apigateway.common.validation.OnUpdateGroup;
 
 @Builder
 @Getter
@@ -17,16 +19,17 @@ public class RateLimitDto {
     @JsonIgnore
     private Long id;
 
-    @NotNull
+    @NotNull(groups = OnCreateGroup.class)
     private Integer perMinute;
 
-    @NotNull
+    @NotNull(groups = OnCreateGroup.class)
     private Integer perHour;
 
-    @NotEmpty
-    @Size(min = 6, max = 100)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotEmpty(groups = OnCreateGroup.class)
+    @Size(min = 6, max = 100, groups = {OnCreateGroup.class, OnUpdateGroup.class})
     private String apiKey;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private String username;
+    private String applicationName;
 }

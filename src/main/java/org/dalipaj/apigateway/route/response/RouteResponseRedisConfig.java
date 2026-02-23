@@ -1,5 +1,9 @@
 package org.dalipaj.apigateway.route.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -17,10 +21,14 @@ public class RouteResponseRedisConfig {
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
 
-        var ser = new Jackson2JsonRedisSerializer<>(RouteRedisResponseWithMetadata.class);
+        var mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        var ser = new Jackson2JsonRedisSerializer<>(mapper, RouteRedisResponseWithMetadata.class);
         template.setValueSerializer(ser);
 
-        template.afterPropertiesSet();
         return template;
     }
 }

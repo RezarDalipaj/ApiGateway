@@ -25,7 +25,6 @@ public class WebClientConfig {
                                 .defaultCodecs()
                                 .maxInMemorySize(16 * 1024 * 1024))
                         .build())
-                .filter(exceptionHandler.createRequestHandler())
                 .filter(exceptionHandler.createResponseErrorHandler())
                 .build();
     }

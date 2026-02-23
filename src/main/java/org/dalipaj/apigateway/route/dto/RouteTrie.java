@@ -74,26 +74,17 @@ public class RouteTrie {
         Node current = root;
 
         for (String segment : tokenize(requestPath)) {
-
             // Static match first
             Node staticChild = current.staticChildren.get(segment);
-            if (staticChild != null) {
+            if (staticChild != null)
                 current = staticChild;
-                continue;
-            }
-
             // Param match
-            if (current.paramChild != null) {
+            else if (current.paramChild != null)
                 current = current.paramChild;
-                continue;
-            }
-
-            return Optional.empty();
         }
 
-        if (current.isRoute) {
+        if (current.isRoute)
             return Optional.of(current.route);
-        }
 
         return Optional.empty();
     }

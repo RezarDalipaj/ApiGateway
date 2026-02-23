@@ -1,26 +1,26 @@
 package org.dalipaj.apigateway.rateLimit;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.dalipaj.apigateway.user.UserEntity;
+import org.dalipaj.apigateway.application.ApplicationEntity;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "rate_limits", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "api_key")
-})
+@Table(name = "rate_limits")
 public class RateLimitEntity {
 
     @Id
@@ -28,8 +28,9 @@ public class RateLimitEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "api_key")
-    private String apiKey;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "api_key_id", unique = true)
+    private ApiKeyEntity apiKey;
 
     @Column(name = "per_minute")
     private Integer perMinute;
@@ -38,5 +39,5 @@ public class RateLimitEntity {
     private Integer perHour;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private UserEntity user;
+    private ApplicationEntity application;
 }

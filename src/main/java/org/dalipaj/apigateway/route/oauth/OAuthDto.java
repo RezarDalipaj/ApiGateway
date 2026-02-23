@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.dalipaj.apigateway.common.validation.OnCreateGroup;
 
 @Builder
 @Getter
@@ -14,13 +15,16 @@ public class OAuthDto {
     @JsonIgnore
     private Long id;
 
-    @NotEmpty
+    @NotEmpty(groups = OnCreateGroup.class)
+    private String name;
+
+    @NotEmpty(groups = OnCreateGroup.class)
     private String tokenEndpoint;
 
-    @NotEmpty
+    @NotEmpty(groups = OnCreateGroup.class)
     private String clientId;
 
-    @NotEmpty
+    @NotEmpty(groups = OnCreateGroup.class)
     private String clientSecret;
 
     private String scope;

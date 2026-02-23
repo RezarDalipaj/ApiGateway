@@ -12,7 +12,9 @@ public class RouteResponseRedisRepository {
     public static final String ROUTE_KEY_PREFIX = "route:";
 
     public void save(RouteRedisResponseWithMetadata routeRedisResponseWithMetadata) {
-        responseRedisTemplate.opsForValue().set(ROUTE_KEY_PREFIX + routeRedisResponseWithMetadata.getExactPath(), routeRedisResponseWithMetadata);
+        responseRedisTemplate.opsForValue().set(
+                ROUTE_KEY_PREFIX + routeRedisResponseWithMetadata.getExactPath(),
+                routeRedisResponseWithMetadata);
     }
 
     public RouteRedisResponseWithMetadata get(String path) {

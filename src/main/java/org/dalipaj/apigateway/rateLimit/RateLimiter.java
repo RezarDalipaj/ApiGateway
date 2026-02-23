@@ -42,7 +42,7 @@ public class RateLimiter {
                 throw new RateLimitException("Rate limit per minute: " + perMinute + " exceeded");
 
             if (hr > perHour)
-                throw  new RateLimitException("Rate limit per hour: " + perHour + " exceeded");
+                throw new RateLimitException("Rate limit per hour: " + perHour + " exceeded");
         }
     }
 }

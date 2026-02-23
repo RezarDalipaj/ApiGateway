@@ -11,7 +11,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class ErrorDto {
+
     private HttpStatus status;
     private String message;
-    private Map<String, String> errors;
+    private Map<String, String> validationErrors;
 }

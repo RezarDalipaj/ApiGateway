@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.dalipaj.apigateway.route.response.RouteRedisResponseWithMetadata;
 import org.dalipaj.apigateway.route.response.RouteResponseDto;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -18,18 +19,15 @@ import java.time.LocalDateTime;
 @Slf4j
 public class WebClientExceptionHandler {
 
-    private String pathWithQueryParams;
 
-    public ExchangeFilterFunction createRequestHandler() {
-        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-            var url = clientRequest.url();
+    private String getPath(HttpRequest request) {
+            var url = request.getURI();
             var queryParams = url.getQuery();
-            pathWithQueryParams = Strings.isBlank(queryParams)
+
+            return Strings.isBlank(queryParams)
                     ? url.getPath()
                     : url.getPath() + "?" + queryParams;
 
-            return Mono.just(clientRequest);
-        });
     }
 
     public ExchangeFilterFunction createResponseErrorHandler() {
@@ -44,9 +42,10 @@ public class WebClientExceptionHandler {
     }
 
     private Mono<ClientResponse> handleApiError(ClientResponse clientResponse, HttpStatus statusCode) {
-        // if the response is empty, or it doesn't map, throw api call exception
+        var request = clientResponse.request();
+
         var errorResponse = RouteRedisResponseWithMetadata.builder()
-                .exactPath(pathWithQueryParams)
+                .exactPath(getPath(request))
                 .lastCached(LocalDateTime.now())
                 .response(RouteResponseDto.builder()
                         .status((HttpStatus) clientResponse.statusCode())
@@ -59,12 +58,12 @@ public class WebClientExceptionHandler {
                     var cannotMapMessage = "Cannot map api call error response";
                     log.error(cannotMapMessage, error);
                     errorResponse.getResponse().setData(cannotMapMessage);
-                    throw new ApiCallException(error.getMessage(), statusCode, errorResponse);
+                    throw new ApiCallException(error.getMessage(), statusCode, request.getMethod(), errorResponse);
                 })
                 // otherwise, return the error body
                 .flatMap(errorBody -> {
                     errorResponse.getResponse().setData(errorBody);
-                    return Mono.error(new ApiCallException("Error", statusCode, errorResponse));
+                    return Mono.error(new ApiCallException("Error", statusCode, request.getMethod(), errorResponse));
                 });
     }
 }

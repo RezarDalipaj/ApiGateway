@@ -5,6 +5,7 @@ import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -12,10 +13,12 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Slf4j
 public class FilterUtil<T> {
 
+    private static final String PERCENTAGE = "%";
+
     private Specification<T> filterField(FilterDto filter) {
         if (filter.getOperator() == FilterOperator.LIKE)
             return (root, query, builder) ->
-                    builder.like(getEntityField(root, filter.getKey()), filter.getValue().toString());
+                    builder.like(getEntityField(root, filter.getKey()), PERCENTAGE.concat(filter.getValue().toString()).concat(PERCENTAGE));
 
         return (root, query, builder) ->
                 builder.equal(getEntityField(root, filter.getKey()), filter.getValue());
@@ -36,7 +39,7 @@ public class FilterUtil<T> {
 
     public List<Specification<T>> getAllSpecs(List<FilterDto> filters) {
         if (isEmpty(filters))
-            return null;
+            return Collections.emptyList();
 
         return filters.stream()
                 .map(this::filterField)

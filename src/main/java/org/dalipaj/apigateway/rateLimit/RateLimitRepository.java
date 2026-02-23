@@ -1,10 +1,8 @@
 package org.dalipaj.apigateway.rateLimit;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.dalipaj.apigateway.common.PaginationRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RateLimitRepository extends JpaRepository<RateLimitEntity, Long>,
-        JpaSpecificationExecutor<RateLimitEntity> {
+public interface RateLimitRepository extends PaginationRepository<RateLimitEntity, Long> {
 }

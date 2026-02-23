@@ -1,7 +1,11 @@
 package org.dalipaj.apigateway.auth.config;
 
+import org.dalipaj.apigateway.application.service.impl.ApplicationService;
 import org.dalipaj.apigateway.auth.service.impl.TokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.dalipaj.apigateway.rateLimit.RateLimitProperties;
+import org.dalipaj.apigateway.route.RouteUtil;
+import org.dalipaj.apigateway.upstream.UpstreamService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -25,12 +29,13 @@ public class WebSecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(authorize ->
-				authorize.requestMatchers("/public/**", "/auth/**", "/oauth2/**")
-						.permitAll()
-				.requestMatchers("/", "/error", "/csrf", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**")
-						.permitAll()
+				authorize
+				.requestMatchers(addAsteriskToEndpoint(ApplicationService.ENDPOINT),
+								 addAsteriskToEndpoint(UpstreamService.ENDPOINT),
+								 addAsteriskToEndpoint(RateLimitProperties.ENDPOINT))
+						.authenticated()
 				.anyRequest()
-				.authenticated());
+						.permitAll());
 
 		http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -41,5 +46,9 @@ public class WebSecurityConfig {
 		http.cors(AbstractHttpConfigurer::disable)
 				.csrf(AbstractHttpConfigurer::disable);
 		return http.build();
+	}
+
+	private static String addAsteriskToEndpoint(String endpoint) {
+		return endpoint + "/**";
 	}
 }
