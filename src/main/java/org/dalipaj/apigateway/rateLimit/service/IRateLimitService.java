@@ -2,10 +2,9 @@ package org.dalipaj.apigateway.rateLimit.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
-import org.dalipaj.apigateway.common.FilterDto;
+import org.dalipaj.apigateway.common.filter.FilterDto;
 import org.dalipaj.apigateway.common.exception.BadRequestException;
-import org.dalipaj.apigateway.rateLimit.RateLimitDto;
-import org.dalipaj.apigateway.rateLimit.RateLimitException;
+import org.dalipaj.apigateway.rateLimit.data.RateLimitDto;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

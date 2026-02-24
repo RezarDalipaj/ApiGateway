@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dalipaj.apigateway.auth.TokenUtil;
+import org.dalipaj.apigateway.auth.service.TokenUtil;
 import org.dalipaj.apigateway.auth.service.IJwtUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

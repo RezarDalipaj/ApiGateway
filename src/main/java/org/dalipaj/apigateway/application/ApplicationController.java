@@ -3,11 +3,10 @@ package org.dalipaj.apigateway.application;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.dalipaj.apigateway.application.service.impl.ApplicationService;
+import org.dalipaj.apigateway.application.data.ApplicationDto;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
-import org.dalipaj.apigateway.common.FilterDto;
+import org.dalipaj.apigateway.common.filter.FilterDto;
 import org.dalipaj.apigateway.common.exception.BadRequestException;
-import org.dalipaj.apigateway.application.service.IApplicationService;
 import org.dalipaj.apigateway.common.validation.OnUpdateGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,7 @@ public class ApplicationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationDto> getById(@PathVariable("id") long id,
-                                                 HttpServletRequest request) throws UnAuthorizedException {
+                                                  HttpServletRequest request) throws UnAuthorizedException {
         return ResponseEntity.ok(applicationService.getById(id, request));
     }
 

@@ -1,7 +1,6 @@
 package org.dalipaj.apigateway.auth.service.impl;
 
-import org.dalipaj.apigateway.application.service.IApplicationService;
-import org.dalipaj.apigateway.auth.UnAuthorizedException;
+import org.dalipaj.apigateway.application.IApplicationService;
 import org.dalipaj.apigateway.auth.service.IJwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

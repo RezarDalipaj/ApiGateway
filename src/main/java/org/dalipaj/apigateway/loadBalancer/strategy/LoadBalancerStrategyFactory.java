@@ -1,7 +1,6 @@
 package org.dalipaj.apigateway.loadBalancer.strategy;
 
 import lombok.RequiredArgsConstructor;
-import org.dalipaj.apigateway.loadBalancer.LoadBalancerType;
 import org.dalipaj.apigateway.loadBalancer.strategy.impl.IpHashStrategy;
 import org.dalipaj.apigateway.loadBalancer.strategy.impl.LatencyStrategy;
 import org.dalipaj.apigateway.loadBalancer.strategy.impl.LeastConnectionsStrategy;

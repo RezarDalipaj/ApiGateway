@@ -1,7 +1,7 @@
 package org.dalipaj.apigateway.application.mapper;
 
 import lombok.experimental.UtilityClass;
-import org.dalipaj.apigateway.application.ApplicationRole;
+import org.dalipaj.apigateway.application.data.ApplicationRole;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;

@@ -1,7 +1,7 @@
 package org.dalipaj.apigateway.application.mapper;
 
-import org.dalipaj.apigateway.application.ApplicationDto;
-import org.dalipaj.apigateway.application.ApplicationEntity;
+import org.dalipaj.apigateway.application.data.ApplicationDto;
+import org.dalipaj.apigateway.application.data.ApplicationEntity;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

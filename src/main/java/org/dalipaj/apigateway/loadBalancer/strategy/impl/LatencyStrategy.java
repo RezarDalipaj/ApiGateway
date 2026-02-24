@@ -2,7 +2,7 @@ package org.dalipaj.apigateway.loadBalancer.strategy.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dalipaj.apigateway.loadBalancer.strategy.LoadBalancerStrategy;
-import org.dalipaj.apigateway.upstream.backend.BackendDto;
+import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -17,7 +17,7 @@ public class LatencyStrategy implements LoadBalancerStrategy {
         return backends.stream()
                 .filter(BackendDto::isHealthy)
                 .min(Comparator.comparingDouble(this::score))
-                .orElseThrow(() -> new NullPointerException("No healthy upstreams"));
+                .orElseThrow(() -> new NullPointerException(NO_HEALTHY_UPSTREAMS));
     }
 
     private double score(BackendDto backend) {

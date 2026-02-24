@@ -1,13 +1,13 @@
 package org.dalipaj.apigateway.upstream;
 
-import org.dalipaj.apigateway.route.RouteEntity;
-import org.dalipaj.apigateway.route.dto.RouteDto;
-import org.dalipaj.apigateway.route.oauth.OAuthDto;
-import org.dalipaj.apigateway.route.oauth.OAuthEntity;
-import org.dalipaj.apigateway.upstream.backend.BackendDto;
-import org.dalipaj.apigateway.upstream.backend.BackendEntity;
-import org.dalipaj.apigateway.upstream.service.ServiceDto;
-import org.dalipaj.apigateway.upstream.service.ServiceEntity;
+import org.dalipaj.apigateway.route.data.RouteEntity;
+import org.dalipaj.apigateway.route.data.RouteDto;
+import org.dalipaj.apigateway.route.data.oauth.OAuthDto;
+import org.dalipaj.apigateway.route.data.oauth.OAuthEntity;
+import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
+import org.dalipaj.apigateway.upstream.data.backend.BackendEntity;
+import org.dalipaj.apigateway.upstream.data.service.ServiceDto;
+import org.dalipaj.apigateway.upstream.data.service.ServiceEntity;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,7 +28,6 @@ public interface UpstreamMapper {
     @Mapping(source = "application.name", target = "applicationName")
     ServiceDto toServiceDto(ServiceEntity service);
 
-    @Mapping(source = "authType", target = "authType", defaultValue = "NONE")
     @Mapping(source = "loadBalancerType", target = "loadBalancerType", defaultValue = "LATENCY")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "service", ignore = true)

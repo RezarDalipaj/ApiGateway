@@ -2,8 +2,7 @@ package org.dalipaj.apigateway.gateway;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.dalipaj.apigateway.gateway.service.IGatewayService;
-import org.dalipaj.apigateway.rateLimit.RateLimitException;
+import org.dalipaj.apigateway.rateLimit.service.RateLimitException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

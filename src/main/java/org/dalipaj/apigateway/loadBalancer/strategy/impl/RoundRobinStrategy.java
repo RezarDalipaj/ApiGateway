@@ -2,7 +2,7 @@ package org.dalipaj.apigateway.loadBalancer.strategy.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dalipaj.apigateway.loadBalancer.strategy.LoadBalancerStrategy;
-import org.dalipaj.apigateway.upstream.backend.BackendDto;
+import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class RoundRobinStrategy implements LoadBalancerStrategy {
                 .sum();
 
         if (totalWeight == 0) {
-            throw new RuntimeException("No healthy upstreams");
+            throw new RuntimeException(NO_HEALTHY_UPSTREAMS);
         }
 
         AtomicInteger counter = counters.computeIfAbsent(
