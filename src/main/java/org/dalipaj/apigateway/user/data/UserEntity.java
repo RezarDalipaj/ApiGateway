@@ -1,4 +1,4 @@
-package org.dalipaj.apigateway.application.data;
+package org.dalipaj.apigateway.user.data;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -9,6 +9,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -17,29 +20,39 @@ import lombok.Setter;
 import org.dalipaj.apigateway.rateLimit.data.RateLimitEntity;
 import org.dalipaj.apigateway.upstream.data.service.ServiceEntity;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name="applications", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"name"})
+@Table(name="users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"username"})
 })
 @Getter
 @Setter
-public class ApplicationEntity {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "username", nullable = false)
+    private String username;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ApplicationRole role;
+    private UserRole role;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_scopes",
+            joinColumns = @JoinColumn(name = "user_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "scope_id", nullable = false)
+    )
+    private Set<ScopeEntity> scopes = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL,
                 fetch = FetchType.LAZY,

@@ -13,5 +13,4 @@ public class RateLimitProperties {
 
     private Long perMinute;
     private Long perHour;
-    public static final String ENDPOINT = "/rate-limits";
 }

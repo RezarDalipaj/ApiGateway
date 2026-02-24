@@ -21,7 +21,6 @@ import java.util.Enumeration;
 public class ProxyService implements IProxyService {
 
     private final WebClient webClient;
-
     private static final String HOST_HEADER = "Host";
 
     @Override

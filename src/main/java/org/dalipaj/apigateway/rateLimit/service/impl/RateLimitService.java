@@ -4,21 +4,21 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dalipaj.apigateway.application.IApplicationService;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
+import org.dalipaj.apigateway.common.exception.BadRequestException;
 import org.dalipaj.apigateway.common.filter.FilterDto;
 import org.dalipaj.apigateway.common.pagination.PaginationService;
-import org.dalipaj.apigateway.common.exception.BadRequestException;
 import org.dalipaj.apigateway.gateway.localcache.GatewayCache;
 import org.dalipaj.apigateway.rateLimit.data.ApiKeyEntity;
 import org.dalipaj.apigateway.rateLimit.data.ApiKeyRepository;
 import org.dalipaj.apigateway.rateLimit.data.RateLimitDto;
 import org.dalipaj.apigateway.rateLimit.data.RateLimitEntity;
+import org.dalipaj.apigateway.rateLimit.data.RateLimitRepository;
+import org.dalipaj.apigateway.rateLimit.service.IRateLimitService;
 import org.dalipaj.apigateway.rateLimit.service.RateLimitException;
 import org.dalipaj.apigateway.rateLimit.service.RateLimitMapper;
 import org.dalipaj.apigateway.rateLimit.service.RateLimitProperties;
-import org.dalipaj.apigateway.rateLimit.data.RateLimitRepository;
-import org.dalipaj.apigateway.rateLimit.service.IRateLimitService;
+import org.dalipaj.apigateway.user.IUserService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +37,7 @@ public class RateLimitService extends PaginationService implements IRateLimitSer
     private final RateLimiter rateLimiter;
     private final RateLimitProperties rateLimitProperties;
     private final GatewayCache gatewayCache;
-    private final IApplicationService applicationService;
+    private final IUserService userService;
 
     public static final String API_KEY_HEADER = "x-api-key";
 
@@ -54,8 +54,8 @@ public class RateLimitService extends PaginationService implements IRateLimitSer
 
     @Override
     public void allowRequest(HttpServletRequest request,
-                             String clientIp)
-            throws RateLimitException, NoSuchAlgorithmException {
+                             String clientIp) throws RateLimitException,
+                                                     NoSuchAlgorithmException {
 
         var apiKey = request.getHeader(API_KEY_HEADER);
 
@@ -71,21 +71,22 @@ public class RateLimitService extends PaginationService implements IRateLimitSer
 
     @Override
     public RateLimitDto save(RateLimitDto rateLimitDto,
-                             HttpServletRequest request)
-            throws UnAuthorizedException, RateLimitException, BadRequestException, NoSuchAlgorithmException {
+                             HttpServletRequest request) throws UnAuthorizedException,
+                                                                BadRequestException,
+                                                                NoSuchAlgorithmException {
 
         var rawApiKey = rateLimitDto.getApiKey();
-        String sha256LookupKey = applicationService.sha256(rawApiKey);
+        String sha256LookupKey = userService.sha256(rawApiKey);
         apiKeyIsUnique(sha256LookupKey);
 
         var entity = rateLimitMapper.toEntity(rateLimitDto);
-        var appName = applicationService.getAppNameFromRequest(request);
-        var application = applicationService.findByName(appName);
+        var appName = userService.getUsernameFromRequest(request);
+        var application = userService.findByUsername(appName);
         entity.setApplication(application);
 
         var apiKeyEntity = apiKeyRepository.save(ApiKeyEntity.builder()
                 .lookupKey(sha256LookupKey)
-                .secretHash(applicationService.hash(rawApiKey))
+                .secretHash(userService.hash(rawApiKey))
                 .build());
 
         entity.setApiKey(apiKeyEntity);
@@ -129,16 +130,16 @@ public class RateLimitService extends PaginationService implements IRateLimitSer
                 .orElseThrow(() -> new NullPointerException("Rate limit with id: " + id + " not found"));
     }
 
-    private RateLimitDto getFromInMemory(String rawApiKey)
-            throws RateLimitException, NoSuchAlgorithmException {
+    private RateLimitDto getFromInMemory(String rawApiKey) throws NoSuchAlgorithmException {
 
-        var hashedApiKey = applicationService.sha256(rawApiKey);
+        var hashedApiKey = userService.sha256(rawApiKey);
         return gatewayCache.getRateLimits().get(hashedApiKey);
     }
 
-    private RateLimitEntity checkAppPermissionsThenGetEntity(Long id, HttpServletRequest request) throws UnAuthorizedException {
+    private RateLimitEntity checkAppPermissionsThenGetEntity(Long id,
+                                                             HttpServletRequest request) throws UnAuthorizedException {
         var entity = findById(id);
-        applicationService.checkAppPermissions(request, entity.getApplication().getName());
+        userService.checkUserPermissions(request, entity.getApplication().getUsername());
 
         return entity;
     }

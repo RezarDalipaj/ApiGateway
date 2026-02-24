@@ -10,5 +10,7 @@ import java.security.NoSuchAlgorithmException;
 @Validated
 public interface IGatewayService {
 
-    RouteResponseDto routeAndPrepareResponse(HttpServletRequest req, Object requestBody) throws RateLimitException, NoSuchAlgorithmException;
+    RouteResponseDto serveResponse(HttpServletRequest req,
+                                   Object requestBody) throws RateLimitException,
+                                                              NoSuchAlgorithmException;
 }

@@ -15,11 +15,15 @@ import java.util.List;
 @Validated
 public interface IRateLimitService {
 
-    void allowRequest(HttpServletRequest request, String clientIp) throws RateLimitException, NoSuchAlgorithmException;
+    void allowRequest(HttpServletRequest request,
+                      String clientIp) throws RateLimitException,
+                                              NoSuchAlgorithmException;
 
     @Transactional
-    RateLimitDto save(RateLimitDto rateLimitDto, HttpServletRequest request) throws UnAuthorizedException,
-            RateLimitException, BadRequestException, NoSuchAlgorithmException;
+    RateLimitDto save(RateLimitDto rateLimitDto,
+                      HttpServletRequest request) throws UnAuthorizedException,
+                                                         BadRequestException,
+                                                         NoSuchAlgorithmException;
 
     RateLimitDto getById(Long id, HttpServletRequest request) throws UnAuthorizedException;
 

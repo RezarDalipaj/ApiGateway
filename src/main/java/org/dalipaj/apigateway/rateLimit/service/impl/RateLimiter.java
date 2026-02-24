@@ -12,7 +12,9 @@ public class RateLimiter {
     
     private final ConcurrentHashMap<String, Counter> counters = new ConcurrentHashMap<>();
 
-    public void allowRequest(String key, long limitPerMinute, long limitPerHour) throws RateLimitException {
+    public void allowRequest(String key,
+                             long limitPerMinute,
+                             long limitPerHour) throws RateLimitException {
         Counter counter = counters.computeIfAbsent(key, k -> new Counter());
         counter.incrementAndCheck(limitPerMinute, limitPerHour);
     }
@@ -23,7 +25,8 @@ public class RateLimiter {
         private long minuteWindow = Instant.now().getEpochSecond() / 60;
         private long hourWindow = Instant.now().getEpochSecond() / 3600;
 
-        synchronized void incrementAndCheck(long perMinute, long perHour) throws RateLimitException {
+        synchronized void incrementAndCheck(long perMinute,
+                                            long perHour) throws RateLimitException {
             long nowMinute = Instant.now().getEpochSecond() / 60;
             long nowHour = Instant.now().getEpochSecond() / 3600;
 

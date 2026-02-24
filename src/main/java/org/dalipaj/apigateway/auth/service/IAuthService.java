@@ -1,7 +1,7 @@
 package org.dalipaj.apigateway.auth.service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.dalipaj.apigateway.application.data.ApplicationDto;
+import org.dalipaj.apigateway.user.data.UserDto;
 import org.dalipaj.apigateway.auth.data.LoginDto;
 import org.dalipaj.apigateway.auth.data.TokenDto;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
@@ -15,6 +15,7 @@ public interface IAuthService {
     TokenDto login(LoginDto loginDto);
 
     @Transactional
-    TokenDto saveApplication(ApplicationDto applicationDto,
-                             HttpServletRequest request) throws BadRequestException, UnAuthorizedException;
+    TokenDto saveUser(UserDto userDto,
+                      HttpServletRequest request) throws BadRequestException,
+                                                         UnAuthorizedException;
 }

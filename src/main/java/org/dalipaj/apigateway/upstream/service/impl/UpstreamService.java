@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dalipaj.apigateway.application.IApplicationService;
+import org.dalipaj.apigateway.user.IUserService;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
 import org.dalipaj.apigateway.common.filter.FilterDto;
 import org.dalipaj.apigateway.common.pagination.PaginationService;
@@ -39,8 +39,7 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
     private final UpstreamMapper upstreamMapper;
     private final GatewayCache gatewayCache;
     private final RouteResponseRedisRepository routeResponseRedisRepository;
-    private final IApplicationService applicationService;
-    public static final String ENDPOINT = "/upstreams";
+    private final IUserService userService;
 
     @PostConstruct
     void initInMemoryRoutes() {
@@ -54,7 +53,8 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
     }
 
     @Override
-    public ServiceDto save(ServiceDto serviceDto, HttpServletRequest request) throws UnAuthorizedException {
+    public ServiceDto save(ServiceDto serviceDto,
+                           HttpServletRequest request) throws UnAuthorizedException {
         var entityId = upstreamTransactionalService.saveEntity(serviceDto, request);
         var entity = upstreamTransactionalService.findById(entityId);
 
@@ -105,8 +105,11 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
     }
 
     @Override
-    public void delete(Long id, HttpServletRequest request) throws UnAuthorizedException {
+    public void delete(Long id,
+                       HttpServletRequest request) throws UnAuthorizedException {
         var entity = checkAppPermissionsAndGetEntity(id, request);
+        upstreamTransactionalService.deleteRouteFromBackends(entity.getId());
+
         serviceRepository.delete(entity);
 
         for (var route : entity.getRoutes()) {
@@ -117,14 +120,16 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
     }
 
     @Override
-    public ServiceDto getById(Long id, HttpServletRequest request) throws UnAuthorizedException {
+    public ServiceDto getById(Long id,
+                              HttpServletRequest request) throws UnAuthorizedException {
         var entity = checkAppPermissionsAndGetEntity(id, request);
         return upstreamMapper.toServiceDto(entity);
     }
 
-    private ServiceEntity checkAppPermissionsAndGetEntity(Long id, HttpServletRequest request) throws UnAuthorizedException {
+    private ServiceEntity checkAppPermissionsAndGetEntity(Long id,
+                                                          HttpServletRequest request) throws UnAuthorizedException {
         var entity = upstreamTransactionalService.findById(id);
-        applicationService.checkAppPermissions(request, entity.getApplication().getName());
+        userService.checkUserPermissions(request, entity.getApplication().getUsername());
 
         return entity;
     }

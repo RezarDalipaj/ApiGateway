@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface ServiceRepository extends PaginationRepository<ServiceEntity, Long> {
 
-    @EntityGraph(attributePaths = { "routes", "routes.backends", "application.name" })
+    @EntityGraph(attributePaths = { "routes", "routes.backends", "application.username" })
     @NonNull
     Optional<ServiceEntity> findById(@NonNull Long serviceId);
 

@@ -14,7 +14,7 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.dalipaj.apigateway.application.data.ApplicationEntity;
+import org.dalipaj.apigateway.user.data.UserEntity;
 import org.dalipaj.apigateway.route.data.RouteEntity;
 
 import java.util.ArrayList;
@@ -43,5 +43,5 @@ public class ServiceEntity {
     private List<RouteEntity> routes = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private ApplicationEntity application;
+    private UserEntity application;
 }

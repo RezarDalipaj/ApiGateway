@@ -26,4 +26,4 @@ app:
   rate-limit:
     perMinute: 10
     perHour: 100
-  healthCheckJobMinutes: 1
+  healthCheckJobSeconds: 120

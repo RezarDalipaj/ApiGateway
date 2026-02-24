@@ -17,7 +17,8 @@ import java.util.List;
 @Validated
 public interface IUpstreamService {
 
-    ServiceDto save(ServiceDto serviceDto, HttpServletRequest request) throws UnAuthorizedException;
+    ServiceDto save(ServiceDto serviceDto,
+                    HttpServletRequest request) throws UnAuthorizedException;
 
     RouteDto getRouteForRequest(String path);
 
@@ -29,7 +30,8 @@ public interface IUpstreamService {
     RouteRedisResponseWithMetadata getRouteResponseFromCache(String path, HttpMethod httpMethod);
 
     @Transactional
-    void delete(Long id, HttpServletRequest request) throws UnAuthorizedException;
+    void delete(Long id,
+                HttpServletRequest request) throws UnAuthorizedException;
 
     ServiceDto getById(Long id, HttpServletRequest request) throws UnAuthorizedException;
 

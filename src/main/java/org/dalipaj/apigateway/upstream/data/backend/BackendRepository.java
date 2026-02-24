@@ -28,4 +28,31 @@ public interface BackendRepository extends JpaRepository<BackendEntity, Long> {
         """, nativeQuery = true)
     void addRouteToBackendIfMissing(@Param("routeId") Long routeId,
                                     @Param("backendId") Long backendId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        DELETE rb
+        FROM route_backends rb
+        WHERE rb.route_id IN (
+            SELECT r.id
+            FROM routes r
+            WHERE r.service_id = :serviceId
+        )
+        """, nativeQuery = true)
+    void deleteRouteBackendsByServiceId(@Param("serviceId") Long serviceId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        DELETE rb
+        FROM route_backends rb
+        WHERE rb.route_id IN (
+            SELECT r.id
+            FROM routes r
+            JOIN services s ON s.id = r.service_id
+            WHERE s.application_id = :appId
+        )
+        """, nativeQuery = true)
+    void deleteRouteBackendsByAppId(@Param("appId") Long appId);
 }

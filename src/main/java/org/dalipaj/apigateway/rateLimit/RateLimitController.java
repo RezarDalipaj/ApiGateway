@@ -4,13 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
-import org.dalipaj.apigateway.common.filter.FilterDto;
+import org.dalipaj.apigateway.common.PreAuthorizeConstants;
 import org.dalipaj.apigateway.common.exception.BadRequestException;
+import org.dalipaj.apigateway.common.filter.FilterDto;
 import org.dalipaj.apigateway.common.validation.OnCreateGroup;
 import org.dalipaj.apigateway.rateLimit.data.RateLimitDto;
 import org.dalipaj.apigateway.rateLimit.service.IRateLimitService;
-import org.dalipaj.apigateway.rateLimit.service.RateLimitException;
-import org.dalipaj.apigateway.rateLimit.service.RateLimitProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,24 +28,26 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @RestController
-@RequestMapping(RateLimitProperties.ENDPOINT)
+@RequestMapping("/rate-limits")
 @RequiredArgsConstructor
 public class RateLimitController {
 
     private final IRateLimitService rateLimitService;
 
     @PostMapping
+    @PreAuthorize(PreAuthorizeConstants.APPLICATION)
     public ResponseEntity<RateLimitDto> create(@Validated(OnCreateGroup.class)
                                                @RequestBody RateLimitDto rateLimitDto,
-                                               HttpServletRequest request)
-            throws UnAuthorizedException, RateLimitException, BadRequestException, NoSuchAlgorithmException {
+                                               HttpServletRequest request) throws UnAuthorizedException,
+                                                                                  BadRequestException,
+                                                                                  NoSuchAlgorithmException {
 
         var createdRateLimit = rateLimitService.save(rateLimitDto, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRateLimit);
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize(PreAuthorizeConstants.ADMIN)
     public ResponseEntity<Page<RateLimitDto>> getAll(@RequestBody(required = false)
                                                      @Valid List<FilterDto> filters,
                                                      @RequestParam(defaultValue = "0") int page,
@@ -56,6 +57,7 @@ public class RateLimitController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(PreAuthorizeConstants.APPLICATION)
     public ResponseEntity<RateLimitDto> delete(@PathVariable Long id,
                                                HttpServletRequest request) throws UnAuthorizedException {
         rateLimitService.delete(id, request);
@@ -63,6 +65,7 @@ public class RateLimitController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(PreAuthorizeConstants.APPLICATION)
     public ResponseEntity<RateLimitDto> get(@PathVariable Long id,
                                             HttpServletRequest request) throws UnAuthorizedException {
         var rateLimit = rateLimitService.getById(id, request);

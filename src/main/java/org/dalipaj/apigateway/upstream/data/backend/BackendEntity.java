@@ -45,8 +45,8 @@ public class BackendEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "route_backends",
-            joinColumns = @JoinColumn(name = "backend_id"),
-            inverseJoinColumns = @JoinColumn(name = "route_id")
+            joinColumns = @JoinColumn(name = "backend_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "route_id", nullable = false)
     )
     private List<RouteEntity> routes = new ArrayList<>();
 }

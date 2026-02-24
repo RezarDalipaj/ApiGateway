@@ -17,11 +17,11 @@ public class GatewayController {
     private final IGatewayService gatewayService;
 
     @RequestMapping("/**")
-    public ResponseEntity<Object> handle(HttpServletRequest req,
-                                         @RequestBody(required = false) Object requestBody)
-            throws RateLimitException, NoSuchAlgorithmException {
+    public ResponseEntity<Object> serveResponse(HttpServletRequest req,
+                                                @RequestBody(required = false) Object requestBody) throws RateLimitException,
+                                                                                                          NoSuchAlgorithmException {
 
-        var response = gatewayService.routeAndPrepareResponse(req, requestBody);
+        var response = gatewayService.serveResponse(req, requestBody);
 
         return ResponseEntity.status(response.getStatus())
                 .headers(response.getHeaders())

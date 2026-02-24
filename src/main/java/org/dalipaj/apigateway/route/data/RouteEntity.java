@@ -1,6 +1,5 @@
 package org.dalipaj.apigateway.route.data;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.dalipaj.apigateway.loadBalancer.strategy.LoadBalancerType;
-import org.dalipaj.apigateway.route.data.oauth.OAuthEntity;
 import org.dalipaj.apigateway.upstream.data.backend.BackendEntity;
 import org.dalipaj.apigateway.upstream.data.service.ServiceEntity;
 
@@ -47,16 +45,7 @@ public class RouteEntity {
     @JoinColumn(name = "service_id", nullable = false)
     private ServiceEntity service;
 
-    @ManyToMany(fetch = FetchType.EAGER,
-            mappedBy = "routes",
-            cascade = {CascadeType.DETACH,
-                    CascadeType.MERGE,
-                    CascadeType.PERSIST,
-                    CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "routes")
     private List<BackendEntity> backends = new ArrayList<>();
-
-    // oauth to upstream (optional)
-    @ManyToOne(fetch = FetchType.EAGER)
-    private OAuthEntity oauth; // nullable
 }
 

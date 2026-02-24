@@ -12,11 +12,11 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dalipaj.apigateway.application.mapper.ApplicationMapper;
+import org.dalipaj.apigateway.user.mapper.UserMapper;
 import org.dalipaj.apigateway.auth.service.TokenUtil;
 import org.dalipaj.apigateway.auth.config.JwtProperties;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
-import org.dalipaj.apigateway.application.data.ApplicationDto;
+import org.dalipaj.apigateway.user.data.UserDto;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TokenProvider {
 
-    private final ApplicationMapper applicationMapper;
+    private final UserMapper userMapper;
     private final JwtProperties jwtProperties;
     public static final String TOKEN_TYPE = "JWT";
 
@@ -43,20 +43,21 @@ public class TokenProvider {
     @Transactional
     public String generateAccessToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        var appDto = applicationMapper.toAppDto(userDetails);
-        return buildToken(appDto);
+        var userDto = userMapper.toUserDto(userDetails);
+        return buildToken(userDto);
     }
 
     @Transactional
-    public String buildToken(ApplicationDto applicationDto) {
+    public String buildToken(UserDto userDto) {
         return Jwts.builder()
                 .setHeaderParam("type", TOKEN_TYPE)
                 .signWith(Keys.hmacShaKeyFor(getSigningKey()), SignatureAlgorithm.HS512)
                 .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(getMinutesFromBoolean()).toInstant()))
                 .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
                 .setId(UUID.randomUUID().toString())
-                .setSubject(applicationDto.getName())
-                .claim("role", applicationDto.getRole())
+                .setSubject(userDto.getUsername())
+                .claim("role", userDto.getRole())
+                .claim("scopes", userDto.getScopes())
                 .compact();
     }
 
@@ -92,12 +93,12 @@ public class TokenProvider {
         return claims.orElseThrow(UnAuthorizedException::new);
     }
 
-    public String getAppNameFromRequest(HttpServletRequest request) throws UnAuthorizedException {
+    public String getUsernameFromRequest(HttpServletRequest request) throws UnAuthorizedException {
         var token = TokenUtil.getTokenFromRequest(request);
-        return getAppNameFromAccessToken(token);
+        return getUsernameFromAccessToken(token);
     }
 
-    public String getAppNameFromAccessToken(String token) throws UnAuthorizedException {
+    public String getUsernameFromAccessToken(String token) throws UnAuthorizedException {
         var claims = getClaimsFromAccessToken(token);
         return claims.getBody().getSubject();
     }

@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.dalipaj.apigateway.gateway.proxy.IProxyService;
 import org.dalipaj.apigateway.gateway.proxy.ProxyRequest;
 import org.dalipaj.apigateway.loadBalancer.strategy.LoadBalancerStrategyFactory;
-import org.dalipaj.apigateway.rateLimit.service.RateLimitException;
 import org.dalipaj.apigateway.rateLimit.service.IRateLimitService;
+import org.dalipaj.apigateway.rateLimit.service.RateLimitException;
 import org.dalipaj.apigateway.route.RouteUtil;
 import org.dalipaj.apigateway.route.data.response.RouteRedisResponseWithMetadata;
 import org.dalipaj.apigateway.route.data.response.RouteResponseDto;
@@ -31,8 +31,9 @@ public class GatewayService implements IGatewayService {
     private static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
     @Override
-    public RouteResponseDto routeAndPrepareResponse(HttpServletRequest req,
-                                                    Object requestBody) throws RateLimitException, NoSuchAlgorithmException {
+    public RouteResponseDto serveResponse(HttpServletRequest req,
+                                          Object requestBody) throws RateLimitException,
+                                                                     NoSuchAlgorithmException {
 
         var clientIp = getClientIp(req);
         rateLimitService.allowRequest(req, clientIp);
@@ -52,7 +53,6 @@ public class GatewayService implements IGatewayService {
                 .httpRequest(req)
                 .requestBody(requestBody)
                 .backend(chosenBackend)
-                .oauth(route.getOauth())
                 .build());
 
         upstreamService.saveRouteResponseInCache(responseWithMetadata, httpMethod);

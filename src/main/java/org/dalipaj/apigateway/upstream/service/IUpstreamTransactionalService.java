@@ -9,7 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 public interface IUpstreamTransactionalService {
 
     @Transactional
-    Long saveEntity(ServiceDto serviceDto, HttpServletRequest request) throws UnAuthorizedException;
+    Long saveEntity(ServiceDto serviceDto,
+                    HttpServletRequest request) throws UnAuthorizedException;
 
     ServiceEntity findById(Long id);
+
+    @Transactional
+    void deleteRouteFromBackends(Long serviceId);
 }

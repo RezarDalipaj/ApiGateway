@@ -18,8 +18,8 @@ public class HealthChecker {
     private final GatewayCache gatewayCache;
     private final WebClient webClient;
 
-    @Scheduled(fixedDelayString = "${app.healthCheckJobMinutes}",
-            timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedDelayString = "${app.healthCheckJobSeconds}",
+            timeUnit = TimeUnit.SECONDS)
     public void check() {
         gatewayCache.getAllUpstreams().values().forEach(backends ->
             backends.forEach(backend -> {
@@ -29,7 +29,7 @@ public class HealthChecker {
                             .uri(backend.getHost() + backend.getHealthCheckPath())
                             .retrieve()
                             .toBodilessEntity()
-                            .block(Duration.ofSeconds(5));
+                            .block(Duration.ofSeconds(3));
 
                     backend.markHealthy(true);
                     log.info("Route {} is healthy", backend.getHost());

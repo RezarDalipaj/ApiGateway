@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.dalipaj.apigateway.application.data.ApplicationEntity;
+import org.dalipaj.apigateway.user.data.UserEntity;
 
 @Data
 @NoArgsConstructor
@@ -29,15 +29,15 @@ public class RateLimitEntity {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "api_key_id", unique = true)
+    @JoinColumn(name = "api_key_id", unique = true, nullable = false)
     private ApiKeyEntity apiKey;
 
-    @Column(name = "per_minute")
+    @Column(name = "per_minute", nullable = false)
     private Integer perMinute;
 
-    @Column(name = "per_hour")
+    @Column(name = "per_hour", nullable = false)
     private Integer perHour;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private ApplicationEntity application;
+    private UserEntity application;
 }

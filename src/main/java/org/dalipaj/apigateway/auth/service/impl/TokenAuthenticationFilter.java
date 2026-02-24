@@ -28,20 +28,21 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain chain) throws ServletException, IOException {
+                                    @NonNull FilterChain chain) throws ServletException,
+                                                                       IOException {
         try {
             TokenUtil.getJwtFromRequest(request)
                     .flatMap(tokenProvider::validateTokenAndGetJws)
                     .ifPresent(jws -> {
-                        var appName = jws.getBody().getSubject();
-                        var userDetails = userDetailsService.loadUserByUsername(appName);
+                        var username = jws.getBody().getSubject();
+                        var userDetails = userDetailsService.loadUserByUsername(username);
                         var authentication = new UsernamePasswordAuthenticationToken
                         (userDetails, null, userDetails.getAuthorities());
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     });
         } catch (Exception e) {
-            log.error("Cannot set application authentication", e);
+            log.error("Cannot set user authentication", e);
         }
         chain.doFilter(request, response);
     }

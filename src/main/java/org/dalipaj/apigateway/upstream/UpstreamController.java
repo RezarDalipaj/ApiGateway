@@ -4,12 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
+import org.dalipaj.apigateway.common.PreAuthorizeConstants;
 import org.dalipaj.apigateway.common.filter.FilterDto;
 import org.dalipaj.apigateway.common.validation.OnCreateGroup;
 import org.dalipaj.apigateway.common.validation.OnUpdateGroup;
 import org.dalipaj.apigateway.upstream.data.service.ServiceDto;
 import org.dalipaj.apigateway.upstream.service.IUpstreamService;
-import org.dalipaj.apigateway.upstream.service.impl.UpstreamService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,22 +28,23 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(UpstreamService.ENDPOINT)
+@RequestMapping("/upstreams")
 @RequiredArgsConstructor
 public class UpstreamController {
 
     private final IUpstreamService upstreamService;
 
     @PostMapping
+    @PreAuthorize(PreAuthorizeConstants.APPLICATION)
     public ResponseEntity<ServiceDto> create(@Validated(OnCreateGroup.class)
-                                           @RequestBody ServiceDto serviceDto,
+                                             @RequestBody ServiceDto serviceDto,
                                              HttpServletRequest request) throws UnAuthorizedException {
         var createdService = upstreamService.save(serviceDto, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdService);
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize(PreAuthorizeConstants.ADMIN)
     public ResponseEntity<Page<ServiceDto>> getAll(@RequestBody(required = false)
                                                  @Valid List<FilterDto> filters,
                                                  @RequestParam(defaultValue = "0") int page,
@@ -53,25 +54,28 @@ public class UpstreamController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize(PreAuthorizeConstants.APPLICATION)
     public ResponseEntity<ServiceDto> update(@Validated(OnUpdateGroup.class)
-                                           @RequestBody ServiceDto serviceDto,
-                                           @PathVariable Long id,
-                                           HttpServletRequest request) throws UnAuthorizedException {
+                                             @RequestBody ServiceDto serviceDto,
+                                             @PathVariable Long id,
+                                             HttpServletRequest request) throws UnAuthorizedException {
         serviceDto.setId(id);
         var updatedService = upstreamService.save(serviceDto, request);
         return ResponseEntity.ok(updatedService);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(PreAuthorizeConstants.APPLICATION)
     public ResponseEntity<Void> delete(@PathVariable Long id,
-                                           HttpServletRequest request) throws UnAuthorizedException {
+                                       HttpServletRequest request) throws UnAuthorizedException {
         upstreamService.delete(id, request);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(PreAuthorizeConstants.APPLICATION)
     public ResponseEntity<ServiceDto> get(@PathVariable Long id,
-                                        HttpServletRequest request) throws UnAuthorizedException {
+                                          HttpServletRequest request) throws UnAuthorizedException {
         var service = upstreamService.getById(id, request);
         return ResponseEntity.ok(service);
     }

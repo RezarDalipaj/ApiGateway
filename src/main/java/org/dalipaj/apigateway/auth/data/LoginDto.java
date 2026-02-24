@@ -14,8 +14,9 @@ import java.io.Serializable;
 @Setter
 public class LoginDto implements Serializable {
 
-    @NotBlank
-    private String name;
+    @NotBlank(groups = OnCreateGroup.class)
+    @Size(min = 4, max = 50, groups = {OnCreateGroup.class, OnUpdateGroup.class})
+    private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank(groups = OnCreateGroup.class)

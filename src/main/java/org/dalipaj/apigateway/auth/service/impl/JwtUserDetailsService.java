@@ -1,6 +1,6 @@
 package org.dalipaj.apigateway.auth.service.impl;
 
-import org.dalipaj.apigateway.application.IApplicationService;
+import org.dalipaj.apigateway.user.IUserService;
 import org.dalipaj.apigateway.auth.service.IJwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,16 +16,16 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class JwtUserDetailsService implements IJwtUserDetailsService {
 
-    private final IApplicationService applicationService;
+    private final IUserService userService;
 
     @Override
-    public UserDetails loadUserByUsername(String appName) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
-            var appDto = applicationService.getByName(appName);
+            var userDto = userService.getByName(username);
 
             Collection<SimpleGrantedAuthority> authorityCollection = new ArrayList<>();
-            authorityCollection.add(new SimpleGrantedAuthority(appDto.getRole()));
-            return new User(appDto.getName(), appDto.getPassword(), authorityCollection);
+            authorityCollection.add(new SimpleGrantedAuthority(userDto.getRole()));
+            return new User(userDto.getUsername(), userDto.getPassword(), authorityCollection);
         } catch (NullPointerException e) {
             throw new UsernameNotFoundException("Bad credentials");
         }
