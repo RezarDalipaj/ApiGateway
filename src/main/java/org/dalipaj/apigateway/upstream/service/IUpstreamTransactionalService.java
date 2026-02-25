@@ -15,5 +15,5 @@ public interface IUpstreamTransactionalService {
     ServiceEntity findById(Long id);
 
     @Transactional
-    void deleteRouteFromBackends(Long serviceId);
+    void deleteRouteFromTargets(Long serviceId);
 }

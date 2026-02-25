@@ -2,14 +2,15 @@ package org.dalipaj.apigateway.upstream.service.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
 import org.dalipaj.apigateway.route.data.RouteDto;
 import org.dalipaj.apigateway.route.data.RouteEntity;
 import org.dalipaj.apigateway.route.data.RouteRepository;
 import org.dalipaj.apigateway.upstream.UpstreamMapper;
-import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
-import org.dalipaj.apigateway.upstream.data.backend.BackendEntity;
-import org.dalipaj.apigateway.upstream.data.backend.BackendRepository;
+import org.dalipaj.apigateway.upstream.data.target.TargetDto;
+import org.dalipaj.apigateway.upstream.data.target.TargetEntity;
+import org.dalipaj.apigateway.upstream.data.target.TargetRepository;
 import org.dalipaj.apigateway.upstream.data.service.ServiceDto;
 import org.dalipaj.apigateway.upstream.data.service.ServiceEntity;
 import org.dalipaj.apigateway.upstream.data.service.ServiceRepository;
@@ -20,13 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UpstreamTransactionalService implements IUpstreamTransactionalService {
 
     private final RouteRepository routeRepository;
-    private final BackendRepository backendRepository;
+    private final TargetRepository targetRepository;
     private final ServiceRepository serviceRepository;
     private final UpstreamMapper upstreamMapper;
     private final IUserService userService;
@@ -48,8 +52,8 @@ public class UpstreamTransactionalService implements IUpstreamTransactionalServi
     }
 
     @Override
-    public void deleteRouteFromBackends(Long serviceId) {
-        backendRepository.deleteRouteBackendsByServiceId(serviceId);
+    public void deleteRouteFromTargets(Long serviceId) {
+        targetRepository.deleteTargetRoutesByServiceId(serviceId);
     }
 
     private Long saveToDb(ServiceDto serviceDto, String appName) {
@@ -82,6 +86,10 @@ public class UpstreamTransactionalService implements IUpstreamTransactionalServi
     private void saveRoutes(ServiceEntity savedService,
                             List<RouteDto> routeDtos) {
         List<RouteEntity> routes = upstreamMapper.toRouteEntityList(savedService.getName(), routeDtos);
+        if (isEmpty(routes)) {
+            log.info("No routes to save for service with id: {}", savedService.getId());
+            return;
+        }
 
         for (int i = 0; i < routes.size(); i++) {
             var route = routes.get(i);
@@ -100,31 +108,36 @@ public class UpstreamTransactionalService implements IUpstreamTransactionalServi
             savedRoute.setService(savedService);
             savedRoute = routeRepository.save(savedRoute);
 
-            saveBackends(savedRoute, routeDtos.get(i).getBackends());
+            saveTargets(savedRoute, routeDtos.get(i).getTargets());
         }
     }
 
-    private void saveBackends(RouteEntity savedRoute,
-                              List<BackendDto> backendDtos) {
+    private void saveTargets(RouteEntity savedRoute,
+                             List<TargetDto> targetDtos) {
         var savedRouteId = savedRoute.getId();
-        List<BackendEntity> backends = upstreamMapper.toBackendEntityList(backendDtos);
+        List<TargetEntity> targets = upstreamMapper.toTargetEntityList(targetDtos);
 
-        for (var backend : backends) {
-            if (backend.getHost() == null)
-                throw new NullPointerException("Backend host cannot be null");
+        if (isEmpty(targets)) {
+            log.info("No targets to save for route with id: {}", savedRouteId);
+            return;
+        }
 
-            var finalBackend = backendRepository.findByHost(backend.getHost()).map(existingBackend -> {
-                if (backend.getHealthCheckPath() != null)
-                    existingBackend.setHealthCheckPath(backend.getHealthCheckPath());
+        for (var target : targets) {
+            if (target.getHost() == null)
+                throw new NullPointerException("Target host cannot be null");
 
-                if (backend.getWeight() != null)
-                    existingBackend.setWeight(backend.getWeight());
+            var finalTarget = targetRepository.findByHost(target.getHost()).map(existingTarget -> {
+                if (target.getHealthCheckPath() != null)
+                    existingTarget.setHealthCheckPath(target.getHealthCheckPath());
 
-                return existingBackend;
-            }).orElse(backend);
+                if (target.getWeight() != null)
+                    existingTarget.setWeight(target.getWeight());
 
-            finalBackend = backendRepository.save(finalBackend);
-            backendRepository.addRouteToBackendIfMissing(savedRouteId, finalBackend.getId());
+                return existingTarget;
+            }).orElse(target);
+
+            finalTarget = targetRepository.save(finalTarget);
+            targetRepository.addRouteToTargetIfMissing(savedRouteId, finalTarget.getId());
         }
     }
 }

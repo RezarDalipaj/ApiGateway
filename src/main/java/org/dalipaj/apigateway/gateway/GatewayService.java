@@ -47,12 +47,12 @@ public class GatewayService implements IGatewayService {
 
         var route = upstreamService.getRouteForRequest(req.getRequestURI());
         var loadBalancerStrategy = loadBalancerStrategyFactory.getStrategy(route.getLoadBalancerType());
-        var chosenBackend = loadBalancerStrategy.chooseBackend(upstreamService.getBackends(route), clientIp);
+        var chosenTarget = loadBalancerStrategy.chooseTarget(upstreamService.getTargets(route), clientIp);
 
         var responseWithMetadata = proxyService.proxyRequest(ProxyRequest.builder()
                 .httpRequest(req)
                 .requestBody(requestBody)
-                .backend(chosenBackend)
+                .target(chosenTarget)
                 .build());
 
         upstreamService.saveRouteResponseInCache(responseWithMetadata, httpMethod);

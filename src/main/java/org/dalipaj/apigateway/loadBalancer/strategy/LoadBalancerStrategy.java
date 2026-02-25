@@ -1,6 +1,6 @@
 package org.dalipaj.apigateway.loadBalancer.strategy;
 
-import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
+import org.dalipaj.apigateway.upstream.data.target.TargetDto;
 
 import java.util.List;
 
@@ -8,5 +8,5 @@ public interface LoadBalancerStrategy {
 
     String NO_HEALTHY_UPSTREAMS = "No healthy upstreams";
 
-    BackendDto chooseBackend(List<BackendDto> backends, String clientIp);
+    TargetDto chooseTarget(List<TargetDto> targetDtos, String clientIp);
 }

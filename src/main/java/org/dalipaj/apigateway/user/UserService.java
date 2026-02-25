@@ -9,7 +9,7 @@ import org.dalipaj.apigateway.auth.service.impl.TokenProvider;
 import org.dalipaj.apigateway.common.exception.BadRequestException;
 import org.dalipaj.apigateway.common.filter.FilterDto;
 import org.dalipaj.apigateway.common.pagination.PaginationService;
-import org.dalipaj.apigateway.upstream.data.backend.BackendRepository;
+import org.dalipaj.apigateway.upstream.data.target.TargetRepository;
 import org.dalipaj.apigateway.user.data.ScopeEntity;
 import org.dalipaj.apigateway.user.data.ScopeRepository;
 import org.dalipaj.apigateway.user.data.UserDto;
@@ -36,7 +36,7 @@ public class UserService extends PaginationService implements IUserService {
     private final UserMapper userMapper;
     private final ScopeRepository scopeRepository;
     private final TokenProvider tokenProvider;
-    private final BackendRepository backendRepository;
+    private final TargetRepository targetRepository;
     private static final String ACCESS_DENIED_MESSAGE = "Access denied: Cannot access this resource";
 
     @Override
@@ -80,7 +80,7 @@ public class UserService extends PaginationService implements IUserService {
         checkUserPermissions(request, userEntity.getUsername());
 
         if (UserRole.ROLE_APPLICATION == userEntity.getRole())
-            backendRepository.deleteRouteBackendsByAppId(userEntity.getId());
+            targetRepository.deleteTargetRoutesByAppId(userEntity.getId());
 
         userRepository.deleteById(id);
     }

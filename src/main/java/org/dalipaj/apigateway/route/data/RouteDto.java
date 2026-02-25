@@ -10,7 +10,7 @@ import lombok.Setter;
 import org.dalipaj.apigateway.common.validation.OnCreateGroup;
 import org.dalipaj.apigateway.common.validation.OnUpdateGroup;
 import org.dalipaj.apigateway.loadBalancer.strategy.LoadBalancerType;
-import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
+import org.dalipaj.apigateway.upstream.data.target.TargetDto;
 
 import java.util.List;
 
@@ -28,5 +28,5 @@ public class RouteDto {
 
     @NotEmpty(groups = OnCreateGroup.class)
     @Valid
-    private List<BackendDto> backends;
+    private List<TargetDto> targets;
 }

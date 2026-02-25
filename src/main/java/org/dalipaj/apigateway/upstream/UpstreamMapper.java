@@ -2,8 +2,8 @@ package org.dalipaj.apigateway.upstream;
 
 import org.dalipaj.apigateway.route.data.RouteDto;
 import org.dalipaj.apigateway.route.data.RouteEntity;
-import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
-import org.dalipaj.apigateway.upstream.data.backend.BackendEntity;
+import org.dalipaj.apigateway.upstream.data.target.TargetDto;
+import org.dalipaj.apigateway.upstream.data.target.TargetEntity;
 import org.dalipaj.apigateway.upstream.data.service.ServiceDto;
 import org.dalipaj.apigateway.upstream.data.service.ServiceEntity;
 import org.mapstruct.InjectionStrategy;
@@ -29,7 +29,7 @@ public interface UpstreamMapper {
     @Mapping(source = "loadBalancerType", target = "loadBalancerType", defaultValue = "LATENCY")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "service", ignore = true)
-    @Mapping(target = "backends", ignore = true)
+    @Mapping(target = "targets", ignore = true)
     RouteEntity toRouteEntity(RouteDto routeDto);
 
     List<RouteEntity> toRouteEntityList(List<RouteDto> routeDtos);
@@ -46,12 +46,12 @@ public interface UpstreamMapper {
     RouteDto toRouteDto(RouteEntity route);
 
     @Mapping(source = "healthCheckPath", target = "healthCheckPath", defaultValue = "/")
-    BackendDto toBackendDto(BackendEntity backend);
+    TargetDto toTargetDto(TargetEntity targetEntity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "routes", ignore = true)
     @Mapping(source = "healthCheckPath", target = "healthCheckPath", defaultValue = "/")
-    BackendEntity toBackendEntity(BackendDto backendDto);
+    TargetEntity toTargetEntity(TargetDto targetDto);
 
-    List<BackendEntity> toBackendEntityList(List<BackendDto> backendDtos);
+    List<TargetEntity> toTargetEntityList(List<TargetDto> targetDtos);
 }

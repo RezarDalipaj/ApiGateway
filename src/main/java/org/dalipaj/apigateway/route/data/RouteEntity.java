@@ -15,7 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.dalipaj.apigateway.loadBalancer.strategy.LoadBalancerType;
-import org.dalipaj.apigateway.upstream.data.backend.BackendEntity;
+import org.dalipaj.apigateway.upstream.data.target.TargetEntity;
 import org.dalipaj.apigateway.upstream.data.service.ServiceEntity;
 
 import java.util.ArrayList;
@@ -46,6 +46,6 @@ public class RouteEntity {
     private ServiceEntity service;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "routes")
-    private List<BackendEntity> backends = new ArrayList<>();
+    private List<TargetEntity> targets = new ArrayList<>();
 }
 

@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dalipaj.apigateway.upstream.data.target.TargetDto;
 import org.dalipaj.apigateway.user.IUserService;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
 import org.dalipaj.apigateway.common.filter.FilterDto;
@@ -16,7 +17,6 @@ import org.dalipaj.apigateway.route.data.RouteTrie;
 import org.dalipaj.apigateway.route.data.response.RouteRedisResponseWithMetadata;
 import org.dalipaj.apigateway.route.data.response.RouteResponseRedisRepository;
 import org.dalipaj.apigateway.upstream.UpstreamMapper;
-import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
 import org.dalipaj.apigateway.upstream.data.service.ServiceDto;
 import org.dalipaj.apigateway.upstream.data.service.ServiceEntity;
 import org.dalipaj.apigateway.upstream.data.service.ServiceRepository;
@@ -75,7 +75,7 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
     }
 
     @Override
-    public List<BackendDto> getBackends(RouteDto routeDto) {
+    public List<TargetDto> getTargets(RouteDto routeDto) {
         return gatewayCache.getUpstreams(routeDto);
     }
 
@@ -108,7 +108,7 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
     public void delete(Long id,
                        HttpServletRequest request) throws UnAuthorizedException {
         var entity = checkAppPermissionsAndGetEntity(id, request);
-        upstreamTransactionalService.deleteRouteFromBackends(entity.getId());
+        upstreamTransactionalService.deleteRouteFromTargets(entity.getId());
 
         serviceRepository.delete(entity);
 

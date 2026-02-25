@@ -2,7 +2,7 @@ package org.dalipaj.apigateway.loadBalancer.strategy.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dalipaj.apigateway.loadBalancer.strategy.LoadBalancerStrategy;
-import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
+import org.dalipaj.apigateway.upstream.data.target.TargetDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,13 +17,13 @@ public class RoundRobinStrategy implements LoadBalancerStrategy {
     private final Map<String, AtomicInteger> counters = new ConcurrentHashMap<>();
 
     @Override
-    public BackendDto chooseBackend(List<BackendDto> backends, String clientIp) {
-        var healthyBackends = backends.stream()
-                .filter(BackendDto::isHealthy)
+    public TargetDto chooseTarget(List<TargetDto> targetDtos, String clientIp) {
+        var healthyTargets = targetDtos.stream()
+                .filter(TargetDto::isHealthy)
                 .toList();
 
-        int totalWeight = healthyBackends.stream()
-                .mapToInt(BackendDto::getEffectiveWeight)
+        int totalWeight = healthyTargets.stream()
+                .mapToInt(TargetDto::getEffectiveWeight)
                 .sum();
 
         if (totalWeight == 0) {
@@ -36,13 +36,13 @@ public class RoundRobinStrategy implements LoadBalancerStrategy {
         int index = Math.abs(counter.incrementAndGet()) % totalWeight;
 
         int cumulative = 0;
-        for (var backend : healthyBackends) {
-            cumulative += backend.getEffectiveWeight();
+        for (var target : healthyTargets) {
+            cumulative += target.getEffectiveWeight();
             if (index < cumulative) {
-                return backend;
+                return target;
             }
         }
 
-        return healthyBackends.getFirst();
+        return healthyTargets.getFirst();
     }
 }

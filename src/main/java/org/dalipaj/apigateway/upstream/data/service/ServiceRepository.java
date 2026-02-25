@@ -14,15 +14,15 @@ import java.util.Optional;
 @Repository
 public interface ServiceRepository extends PaginationRepository<ServiceEntity, Long> {
 
-    @EntityGraph(attributePaths = { "routes", "routes.backends", "application.username" })
+    @EntityGraph(attributePaths = { "routes", "routes.targets", "application.username" })
     @NonNull
     Optional<ServiceEntity> findById(@NonNull Long serviceId);
 
-    @EntityGraph(attributePaths = { "routes", "routes.backends" })
+    @EntityGraph(attributePaths = { "routes", "routes.targets" })
     @NonNull
     Page<ServiceEntity> findAll(Specification<ServiceEntity> spec, @NonNull Pageable pageable);
 
-    @EntityGraph(attributePaths = { "routes", "routes.backends" })
+    @EntityGraph(attributePaths = { "routes", "routes.targets" })
     @NonNull
     List<ServiceEntity> findAll();
 }

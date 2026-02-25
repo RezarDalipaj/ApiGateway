@@ -21,22 +21,22 @@ public class HealthChecker {
     @Scheduled(fixedDelayString = "${app.healthCheckJobSeconds}",
             timeUnit = TimeUnit.SECONDS)
     public void check() {
-        gatewayCache.getAllUpstreams().values().forEach(backends ->
-            backends.forEach(backend -> {
+        gatewayCache.getAllUpstreams().values().forEach(targets ->
+            targets.forEach(target -> {
                 try {
-                    log.info("Checking route health check for {}", backend.getHost());
+                    log.info("Checking route health check for {}", target.getHost());
                     webClient.get()
-                            .uri(backend.getHost() + backend.getHealthCheckPath())
+                            .uri(target.getHost() + target.getHealthCheckPath())
                             .retrieve()
                             .toBodilessEntity()
                             .block(Duration.ofSeconds(3));
 
-                    backend.markHealthy(true);
-                    log.info("Route {} is healthy", backend.getHost());
+                    target.markHealthy(true);
+                    log.info("Route {} is healthy", target.getHost());
 
                 } catch (Exception e) {
-                    log.warn("Route {} is unhealthy", backend.getHost(), e);
-                    backend.markHealthy(false);
+                    log.warn("Route {} is unhealthy", target.getHost(), e);
+                    target.markHealthy(false);
                 }
             })
         );

@@ -5,7 +5,7 @@ import org.dalipaj.apigateway.auth.UnAuthorizedException;
 import org.dalipaj.apigateway.common.filter.FilterDto;
 import org.dalipaj.apigateway.route.data.RouteDto;
 import org.dalipaj.apigateway.route.data.response.RouteRedisResponseWithMetadata;
-import org.dalipaj.apigateway.upstream.data.backend.BackendDto;
+import org.dalipaj.apigateway.upstream.data.target.TargetDto;
 import org.dalipaj.apigateway.upstream.data.service.ServiceDto;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpMethod;
@@ -22,7 +22,7 @@ public interface IUpstreamService {
 
     RouteDto getRouteForRequest(String path);
 
-    List<BackendDto> getBackends(RouteDto routeDto);
+    List<TargetDto> getTargets(RouteDto routeDto);
 
     @Transactional
     void saveRouteResponseInCache(RouteRedisResponseWithMetadata routeRedisResponseWithMetadata, HttpMethod httpMethod);

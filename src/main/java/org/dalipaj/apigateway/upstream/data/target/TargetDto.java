@@ -1,4 +1,4 @@
-package org.dalipaj.apigateway.upstream.data.backend;
+package org.dalipaj.apigateway.upstream.data.target;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
-public class BackendDto implements Serializable {
+public class TargetDto implements Serializable {
 
     @NotEmpty(groups = OnCreateGroup.class)
     private final String host;
@@ -26,7 +26,7 @@ public class BackendDto implements Serializable {
     private volatile boolean healthy = true;
     private volatile int effectiveWeight;
 
-    public BackendDto(String host, String healthCheckPath, int weight) {
+    public TargetDto(String host, String healthCheckPath, int weight) {
         this.host = host;
         this.healthCheckPath = healthCheckPath;
         this.weight = weight;

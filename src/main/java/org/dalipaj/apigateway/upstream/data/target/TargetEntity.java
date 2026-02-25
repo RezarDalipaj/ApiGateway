@@ -1,4 +1,4 @@
-package org.dalipaj.apigateway.upstream.data.backend;
+package org.dalipaj.apigateway.upstream.data.target;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,10 +23,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "backends", uniqueConstraints = {
+@Table(name = "targets", uniqueConstraints = {
         @UniqueConstraint(columnNames = "host")
 })
-public class BackendEntity {
+public class TargetEntity {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -44,8 +44,8 @@ public class BackendEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "route_backends",
-            joinColumns = @JoinColumn(name = "backend_id", nullable = false),
+            name = "route_targets",
+            joinColumns = @JoinColumn(name = "target_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "route_id", nullable = false)
     )
     private List<RouteEntity> routes = new ArrayList<>();

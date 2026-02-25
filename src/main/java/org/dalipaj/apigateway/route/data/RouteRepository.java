@@ -13,11 +13,11 @@ public interface RouteRepository extends JpaRepository<RouteEntity, Long> {
 
     Optional<RouteEntity> findByPath(String path);
 
-    @EntityGraph(attributePaths = { "backends" })
+    @EntityGraph(attributePaths = { "targets" })
     @NonNull
     Optional<RouteEntity> findById(@NonNull Long id);
 
-    @EntityGraph(attributePaths = { "backends" })
+    @EntityGraph(attributePaths = { "targets" })
     @NonNull
     List<RouteEntity> findAll();
 }

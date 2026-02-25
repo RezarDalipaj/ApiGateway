@@ -26,12 +26,12 @@ public class ProxyService implements IProxyService {
     @Override
     public RouteRedisResponseWithMetadata proxyRequest(ProxyRequest proxyRequest) {
         var httpRequest = proxyRequest.getHttpRequest();
-        var backend = proxyRequest.getBackend();
+        var target = proxyRequest.getTarget();
 
         var pathWithQueryParams = RouteUtil.getPathWithQueryParams(httpRequest);
-        var url = backend.getHost() + RouteUtil.removeServiceName(pathWithQueryParams);
+        var url = target.getHost() + RouteUtil.removeServiceName(pathWithQueryParams);
 
-        backend.incrementConnections();
+        target.incrementConnections();
         long start = System.currentTimeMillis();
 
         try {
@@ -72,10 +72,10 @@ public class ProxyService implements IProxyService {
                         .build());
             }
 
-            backend.updateLatency(System.currentTimeMillis() - start);
+            target.updateLatency(System.currentTimeMillis() - start);
             return responseWithMetadata;
         } finally {
-            backend.decrementConnections();
+            target.decrementConnections();
         }
     }
 }
