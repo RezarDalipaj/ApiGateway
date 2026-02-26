@@ -3,8 +3,10 @@ package org.dalipaj.apigateway.gateway.webclient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.dalipaj.apigateway.gateway.GatewayService;
 import org.dalipaj.apigateway.route.data.response.RouteRedisResponseWithMetadata;
 import org.dalipaj.apigateway.route.data.response.RouteResponseDto;
+import org.dalipaj.apigateway.route.data.response.RouteResponseKey;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -12,13 +14,12 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+import static org.dalipaj.apigateway.route.RouteUtil.QUERY_PARAM_START;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class WebClientExceptionHandler {
-
 
     private String getPath(HttpRequest request) {
             var url = request.getURI();
@@ -26,7 +27,7 @@ public class WebClientExceptionHandler {
 
             return Strings.isBlank(queryParams)
                     ? url.getPath()
-                    : url.getPath() + "?" + queryParams;
+                    : url.getPath() + QUERY_PARAM_START + queryParams;
 
     }
 
@@ -45,8 +46,11 @@ public class WebClientExceptionHandler {
         var request = clientResponse.request();
 
         var errorResponse = RouteRedisResponseWithMetadata.builder()
-                .exactPath(getPath(request))
-                .lastCached(LocalDateTime.now())
+                .key(RouteResponseKey.builder()
+                        .exactPath(getPath(request))
+                        .allowedSortedHeaders(GatewayService.allowListAndSortHeaders(request.getHeaders()))
+                        .httpMethod(request.getMethod().toString())
+                        .build())
                 .response(RouteResponseDto.builder()
                         .status((HttpStatus) clientResponse.statusCode())
                         .headers(clientResponse.headers().asHttpHeaders())

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -13,8 +14,10 @@ import java.io.Serializable;
 @Builder
 @Getter
 @Setter
-public class RouteRedisResponseWithMetadata implements Serializable {
+@ToString
+public class RouteResponseKey implements Serializable {
 
-    private RouteResponseDto response;
-    private RouteResponseKey key;
+    private String exactPath;
+    private String allowedSortedHeaders;
+    private String httpMethod;
 }

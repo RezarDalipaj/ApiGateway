@@ -4,28 +4,30 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dalipaj.apigateway.upstream.data.target.TargetDto;
-import org.dalipaj.apigateway.user.IUserService;
 import org.dalipaj.apigateway.auth.UnAuthorizedException;
 import org.dalipaj.apigateway.common.filter.FilterDto;
 import org.dalipaj.apigateway.common.pagination.PaginationService;
 import org.dalipaj.apigateway.gateway.localcache.GatewayCache;
+import org.dalipaj.apigateway.route.data.RouteDto;
 import org.dalipaj.apigateway.route.data.RouteEntity;
 import org.dalipaj.apigateway.route.data.RouteRepository;
-import org.dalipaj.apigateway.route.data.RouteDto;
 import org.dalipaj.apigateway.route.data.RouteTrie;
 import org.dalipaj.apigateway.route.data.response.RouteRedisResponseWithMetadata;
+import org.dalipaj.apigateway.route.data.response.RouteResponseKey;
 import org.dalipaj.apigateway.route.data.response.RouteResponseRedisRepository;
 import org.dalipaj.apigateway.upstream.UpstreamMapper;
 import org.dalipaj.apigateway.upstream.data.service.ServiceDto;
 import org.dalipaj.apigateway.upstream.data.service.ServiceEntity;
 import org.dalipaj.apigateway.upstream.data.service.ServiceRepository;
+import org.dalipaj.apigateway.upstream.data.target.TargetDto;
 import org.dalipaj.apigateway.upstream.service.IUpstreamService;
 import org.dalipaj.apigateway.upstream.service.IUpstreamTransactionalService;
+import org.dalipaj.apigateway.user.IUserService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Service
@@ -41,6 +43,8 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
     private final RouteResponseRedisRepository routeResponseRedisRepository;
     private final IUserService userService;
 
+    private static final String GET_METHOD = HttpMethod.GET.toString();
+
     @PostConstruct
     void initInMemoryRoutes() {
         gatewayCache.setRouteTrie(new RouteTrie());
@@ -48,7 +52,7 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
         for (RouteEntity route : routeRepository.findAll()) {
             var routeDto = upstreamMapper.toRouteDto(route);
             gatewayCache.getRouteTrie().insert(routeDto);
-            gatewayCache.addRouteUpstreams(routeDto);
+            gatewayCache.addRouteTargets(routeDto);
         }
     }
 
@@ -62,7 +66,7 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
 
         for (var route : serviceDto.getRoutes()) {
             gatewayCache.getRouteTrie().insert(route);
-            gatewayCache.addRouteUpstreams(route);
+            gatewayCache.addRouteTargets(route);
         }
 
         return serviceDto;
@@ -76,15 +80,15 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
 
     @Override
     public List<TargetDto> getTargets(RouteDto routeDto) {
-        return gatewayCache.getUpstreams(routeDto);
+        return gatewayCache.getTargetsOfRoute(routeDto);
     }
 
     @Override
-    public void saveRouteResponseInCache(RouteRedisResponseWithMetadata routeRedisResponseWithMetadata,
-                                         HttpMethod httpMethod) {
-        var exactPath = routeRedisResponseWithMetadata.getExactPath();
+    public void saveRouteResponseInCache(RouteRedisResponseWithMetadata routeRedisResponseWithMetadata) throws NoSuchAlgorithmException {
+        var exactPath = routeRedisResponseWithMetadata.getKey().getExactPath();
+        var httpMethod = routeRedisResponseWithMetadata.getKey().getHttpMethod();
 
-        if (httpMethod == HttpMethod.GET) {
+        if (httpMethod.equals(GET_METHOD)) {
             log.info("Saving response for GET request on path: {} in redis", exactPath);
             routeResponseRedisRepository.save(routeRedisResponseWithMetadata);
         }
@@ -94,14 +98,17 @@ public class UpstreamService extends PaginationService implements IUpstreamServi
     }
 
     @Override
-    public RouteRedisResponseWithMetadata getRouteResponseFromCache(String path, HttpMethod httpMethod) {
-        if (HttpMethod.GET != httpMethod) {
+    public RouteRedisResponseWithMetadata getRouteResponseFromCache(RouteResponseKey key) throws NoSuchAlgorithmException {
+        var path = key.getExactPath();
+        var httpMethod = key.getHttpMethod();
+
+        if (!httpMethod.equals(GET_METHOD)) {
             log.info("Not fetching response for {} request on path: {} from redis, only GET responses are cached",
                     httpMethod, path);
             return null;
         }
 
-        return routeResponseRedisRepository.get(path);
+        return routeResponseRedisRepository.get(key);
     }
 
     @Override

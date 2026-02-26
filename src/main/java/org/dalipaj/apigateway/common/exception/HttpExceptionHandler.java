@@ -62,10 +62,9 @@ public class HttpExceptionHandler {
     }
 
     @ExceptionHandler(ApiCallException.class)
-    public ResponseEntity<RouteResponseDto> handleApiCallException(ApiCallException apiCallException) {
+    public ResponseEntity<RouteResponseDto> handleApiCallException(ApiCallException apiCallException) throws NoSuchAlgorithmException {
         var responseWithMetadata = apiCallException.getResponseWithMetadata();
-        upstreamService.saveRouteResponseInCache(responseWithMetadata,
-                apiCallException.getHttpMethod());
+        upstreamService.saveRouteResponseInCache(responseWithMetadata);
 
         return ResponseEntity.status(apiCallException.getStatus())
                 .body(responseWithMetadata.getResponse());

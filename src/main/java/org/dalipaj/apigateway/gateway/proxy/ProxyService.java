@@ -5,13 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.dalipaj.apigateway.route.RouteUtil;
 import org.dalipaj.apigateway.route.data.response.RouteRedisResponseWithMetadata;
 import org.dalipaj.apigateway.route.data.response.RouteResponseDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Enumeration;
 
@@ -19,6 +20,9 @@ import java.util.Enumeration;
 @RequiredArgsConstructor
 @Slf4j
 public class ProxyService implements IProxyService {
+
+    @Value("${app.upstreamTimeoutSeconds}")
+    private Long upstreamTimeoutSeconds;
 
     private final WebClient webClient;
     private static final String HOST_HEADER = "Host";
@@ -28,8 +32,8 @@ public class ProxyService implements IProxyService {
         var httpRequest = proxyRequest.getHttpRequest();
         var target = proxyRequest.getTarget();
 
-        var pathWithQueryParams = RouteUtil.getPathWithQueryParams(httpRequest);
-        var url = target.getHost() + RouteUtil.removeServiceName(pathWithQueryParams);
+        var pathToProxy = RouteUtil.removeServiceName(proxyRequest.getRedisKey().getExactPath());
+        var url = target.getHost() + pathToProxy;
 
         target.incrementConnections();
         long start = System.currentTimeMillis();
@@ -57,11 +61,11 @@ public class ProxyService implements IProxyService {
 
             ResponseEntity<Object> response = responseSpec
                     .toEntity(Object.class)
+                    .timeout(Duration.ofSeconds(upstreamTimeoutSeconds))
                     .block();
 
             var responseWithMetadata = RouteRedisResponseWithMetadata.builder()
-                    .exactPath(pathWithQueryParams)
-                    .lastCached(LocalDateTime.now())
+                    .key(proxyRequest.getRedisKey())
                     .build();
 
             if (response != null) {

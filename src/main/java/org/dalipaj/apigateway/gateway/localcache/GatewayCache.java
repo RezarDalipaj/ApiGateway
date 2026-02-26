@@ -22,17 +22,17 @@ public class GatewayCache {
 
     private RouteTrie routeTrie;
     private Map<String, RateLimitDto> rateLimits = new HashMap<>();
-    private final Map<String, List<TargetDto>> upstreams = new ConcurrentHashMap<>();
+    private final Map<String, List<TargetDto>> targets = new ConcurrentHashMap<>();
 
-    public void addRouteUpstreams(RouteDto routeDto) {
-        upstreams.put(routeDto.getPath(), new CopyOnWriteArrayList<>(routeDto.getTargets()));
+    public void addRouteTargets(RouteDto routeDto) {
+        targets.put(routeDto.getPath(), new CopyOnWriteArrayList<>(routeDto.getTargets()));
     }
 
-    public List<TargetDto> getUpstreams(RouteDto routeDto) {
-        return upstreams.getOrDefault(routeDto.getPath(), new ArrayList<>());
+    public List<TargetDto> getTargetsOfRoute(RouteDto routeDto) {
+        return targets.getOrDefault(routeDto.getPath(), new ArrayList<>());
     }
 
-    public Map<String, List<TargetDto>> getAllUpstreams() {
-        return upstreams;
+    public Map<String, List<TargetDto>> getAllTargets() {
+        return targets;
     }
 }

@@ -9,4 +9,6 @@ public interface IHashService {
     String hash(String raw);
 
     String sha256(String raw) throws NoSuchAlgorithmException;
+
+    String sha256(Object raw) throws NoSuchAlgorithmException;
 }

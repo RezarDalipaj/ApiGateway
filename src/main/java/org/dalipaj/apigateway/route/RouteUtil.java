@@ -8,7 +8,7 @@ import org.apache.logging.log4j.util.Strings;
 public class RouteUtil {
 
     private static final char SLASH = '/';
-    private static final String QUERY_PARAM_START = "?";
+    public static final String QUERY_PARAM_START = "?";
 
     public String getPathWithQueryParams(HttpServletRequest request) {
         var path = request.getRequestURI();

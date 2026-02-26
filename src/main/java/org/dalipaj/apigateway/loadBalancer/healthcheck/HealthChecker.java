@@ -21,7 +21,7 @@ public class HealthChecker {
     @Scheduled(fixedDelayString = "${app.healthCheckJobSeconds}",
             timeUnit = TimeUnit.SECONDS)
     public void check() {
-        gatewayCache.getAllUpstreams().values().forEach(targets ->
+        gatewayCache.getAllTargets().values().forEach(targets ->
             targets.forEach(target -> {
                 try {
                     log.info("Checking route health check for {}", target.getHost());

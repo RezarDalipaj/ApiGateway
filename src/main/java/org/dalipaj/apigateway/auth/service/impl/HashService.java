@@ -16,6 +16,8 @@ import java.util.HexFormat;
 @RequiredArgsConstructor
 public class HashService implements IHashService {
 
+    private static final String HASHING_ALGORITHM = "SHA-256";
+
     @Value("${app.salt}")
     private String salt;
     private final PasswordEncoder passwordEncoder;
@@ -37,8 +39,15 @@ public class HashService implements IHashService {
             return raw;
 
         var salted = salt(raw);
-        var digest = MessageDigest.getInstance("SHA-256");
+        var digest = MessageDigest.getInstance(HASHING_ALGORITHM);
         byte[] hash = digest.digest(salted.getBytes(StandardCharsets.UTF_8));
+        return HexFormat.of().formatHex(hash);
+    }
+
+    @Override
+    public String sha256(Object raw) throws NoSuchAlgorithmException {
+        var digest = MessageDigest.getInstance(HASHING_ALGORITHM);
+        byte[] hash = digest.digest(raw.toString().getBytes(StandardCharsets.UTF_8));
         return HexFormat.of().formatHex(hash);
     }
 }
